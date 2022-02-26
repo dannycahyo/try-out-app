@@ -1,25 +1,17 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Layout from "./containers/Layout";
+import { Box } from "@chakra-ui/react";
+import QuestionSection from "./components/QuestionSection";
+import AnswerSection from "./components/AnswerSection";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Layout>
+      <Box minH="2xl">
+        <QuestionSection />
+        <AnswerSection />
+      </Box>
+    </Layout>
   );
 }
 
