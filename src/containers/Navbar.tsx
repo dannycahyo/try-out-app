@@ -1,9 +1,17 @@
 import React from "react";
-import { Flex, Box, Heading, Spacer, Button } from "@chakra-ui/react";
+import {
+  Flex,
+  Box,
+  Heading,
+  Spacer,
+  ButtonGroup,
+  IconButton,
+} from "@chakra-ui/react";
+import { FaGithub } from "react-icons/fa";
 
 const Navbar = () => {
   return (
-    <Flex p="4" bgGradient="linear(to-l, #7928CA, #FF0080)">
+    <Flex py="4" bg="#4E1EF7" px={{ base: "12", md: "24", lg: "36" }}>
       <Box p="2">
         <Heading size="md" color="white">
           Simple Try Out App
@@ -11,19 +19,18 @@ const Navbar = () => {
       </Box>
       <Spacer />
       <Box>
-        <Button
-          colorScheme="teal"
-          mr="4"
-          bgGradient="linear(to-r, red.500, yellow.500)"
-        >
-          Sign Up
-        </Button>
-        <Button
-          colorScheme="teal"
-          bgGradient="linear(to-r, red.500, yellow.500)"
-        >
-          Log in
-        </Button>
+        <ButtonGroup pl="2" bg="white" borderRadius="base">
+          <Heading size="md" mt="2">
+            Github Repository
+          </Heading>
+          <IconButton
+            bg="white"
+            as="a"
+            href="#"
+            aria-label="GitHub"
+            icon={<FaGithub fontSize="1.25rem" />}
+          />
+        </ButtonGroup>
       </Box>
     </Flex>
   );

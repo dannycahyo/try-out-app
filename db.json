@@ -1,0 +1,114 @@
+{
+    "questions": [
+        {
+            "title": "How's life?",
+            "correctAnswer": "So Excited",
+            "options": [
+                "B Aja",
+                "Super Duper",
+                "OK Fine",
+                "So Excited",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Deremmah Odik?",
+            "correctAnswer": "B Aja",
+            "options": [
+                "B Aja",
+                "Super Duper",
+                "OK Fine",
+                "All Good",
+                "So Excited"
+            ]
+        },
+        {
+            "title": "Gimana kabar?",
+            "correctAnswer": "So Excited",
+            "options": [
+                "OK Fine",
+                "B Aja",
+                "So Excited",
+                "Super Duper",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Piye Kabare Cak?",
+            "correctAnswer": "OK Fine",
+            "options": [
+                "B Aja",
+                "Super Duper",
+                "OK Fine",
+                "So Excited",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Gimana pas udah kelar ngengek?",
+            "correctAnswer": "All Good",
+            "options": [
+                "OK Fine",
+                "B Aja",
+                "So Excited",
+                "Super Duper",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Koo gitu sih? Wdyt?",
+            "correctAnswer": "So Excited",
+            "options": [
+                "OK Fine",
+                "B Aja",
+                "So Excited",
+                "Super Duper",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Buntu aku cok, gimana ya?",
+            "correctAnswer": "OK Fine",
+            "options": [
+                "B Aja",
+                "All Good",
+                "OK Fine",
+                "So Excited",
+                "Super Duper"
+            ]
+        },
+        {
+            "title": "Hadeehh, capek cok. Kamu?",
+            "correctAnswer": "B Aja",
+            "options": [
+                "All Good",
+                "OK Fine",
+                "Super Duper",
+                "B Aja",
+                "So Excited"
+            ]
+        },
+        {
+            "title": "Sini cerita, gimana2?",
+            "correctAnswer": "OK Fine",
+            "options": [
+                "Super Duper",
+                "OK Fine",
+                "B Aja",
+                "So Excited",
+                "All Good"
+            ]
+        },
+        {
+            "title": "Jangan lupa makan ya, OK?",
+            "correctAnswer": "Super Duper",
+            "options": [
+                "B Aja",
+                "OK Fine",
+                "All Good",
+                "So Excited",
+                "Super Duper"
+            ]
+        }
+    ]
+}

@@ -1,23 +1,26 @@
-import React from "react";
-import { Box, Center, Heading } from "@chakra-ui/react";
+import { Box, Center, Text } from "@chakra-ui/react";
 
-const QuestionSection = () => {
+const QuestionSection = ({ question }: { question: string }) => {
   return (
-    <Box py="6">
-      <Center>
-        <Box
-          borderWidth="2px"
-          borderRadius="lg"
-          overflow="hidden"
-          minW="2xl"
-          p="4"
+    <Center pb="4">
+      <Box
+        borderWidth="2px"
+        borderRadius="lg"
+        overflow="hidden"
+        minW="lg"
+        p="4"
+      >
+        <Text
+          bgGradient="linear(to-l, #FBD38D, #0BC5EA)"
+          bgClip="text"
+          fontSize="3xl"
+          fontWeight="extrabold"
+          textAlign="center"
         >
-          <Heading size="lg" textAlign="center">
-            Why we can't put If Statement on JSX?
-          </Heading>
-        </Box>
-      </Center>
-    </Box>
+          {question}
+        </Text>
+      </Box>
+    </Center>
   );
 };
 

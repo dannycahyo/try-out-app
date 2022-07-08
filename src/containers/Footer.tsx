@@ -1,12 +1,11 @@
 import {
   ButtonGroup,
-  Box,
   IconButton,
   Stack,
   Text,
   Heading,
+  Box,
 } from "@chakra-ui/react";
-import * as React from "react";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
 
 export const Footer = () => (
@@ -14,12 +13,14 @@ export const Footer = () => (
     as="footer"
     role="contentinfo"
     p="4"
-    bgGradient="linear(to-l, #7928CA, #FF0080)"
+    bg="#4E1EF7"
     color="white"
+    py={{ base: "12", md: "16" }}
+    px={{ base: "12", md: "24", lg: "36" }}
   >
     <Stack spacing={{ base: "4", md: "5" }}>
       <Stack justify="space-between" direction="row" align="center">
-        <Heading size="md">Put Your Logo Here</Heading>
+        <Heading size="md">Danny Dwi Cahyono</Heading>
         <ButtonGroup variant="ghost">
           <IconButton
             as="a"
@@ -42,8 +43,7 @@ export const Footer = () => (
         </ButtonGroup>
       </Stack>
       <Text fontSize="sm" color="subtle">
-        &copy; {new Date().getFullYear()} Simple Try Out App, Inc. All rights
-        reserved.
+        &copy; 2022 Simple Try Out App, Inc. All rights reserved.
       </Text>
     </Stack>
   </Box>
