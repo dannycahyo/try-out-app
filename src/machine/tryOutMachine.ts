@@ -10,7 +10,7 @@ type question = {
 interface Context {
   questions: question[];
   selectedQuestion: number;
-  chosenOption: number;
+  selectedOption: number;
   correctAnswer: number;
   elapsed: number;
   interval: number;
@@ -25,7 +25,7 @@ const setTimer = (ctx: Context) => (send: any) => {
   return () => clearInterval(interval);
 };
 
-// Todo => Fix The Bug On The Choose Answer
+// Todo => Find Proper Evaluation Mechanism Based On The Questions Length}
 export const tryOutMachine = createMachine<Context>({
   id: "TryOut App",
   initial: "idle",
@@ -38,7 +38,8 @@ export const tryOutMachine = createMachine<Context>({
       },
     ],
     selectedQuestion: 0,
-    chosenOption: 0,
+    // Todo => Remove the hacky way (99) once the alternative bug fixing is found
+    selectedOption: 99,
     correctAnswer: 0,
     elapsed: 0,
     interval: 0.1,
@@ -158,20 +159,22 @@ export const tryOutMachine = createMachine<Context>({
     }),
     nextQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion + 1,
+      correctAnswer: (ctx, event) => {
+        if (event.rightOption === event.finalAnswer) {
+          return ctx.correctAnswer + 1;
+        }
+        return ctx.correctAnswer;
+      },
     }),
     prevQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion - 1,
     }),
     chooseAnswer: assign({
-      chosenOption: (ctx) => ctx.chosenOption + 1,
-      correctAnswer: (ctx, event) =>
-        event.option === event.rightOption
-          ? ctx.correctAnswer + 1
-          : ctx.correctAnswer,
+      selectedOption: (ctx, event) => event.index,
     }),
     restartTheTest: assign({
       selectedQuestion: (ctx) => 0,
-      chosenOption: (ctx) => 0,
+      selectedOption: (ctx) => 0,
       correctAnswer: (ctx) => 0,
       elapsed: (ctx) => 0,
       interval: (ctx) => 0.1,

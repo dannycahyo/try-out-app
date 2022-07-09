@@ -17,7 +17,6 @@ import {
   ModalContent,
   ModalBody,
   ModalFooter,
-  ModalCloseButton,
   ModalHeader,
   Button,
   Stat,
@@ -38,7 +37,7 @@ function App() {
   const { data, status } = useQuery("questions", getQuestions);
   const [state, send, service] = useMachine(tryOutMachine);
   const {
-    chosenOption,
+    selectedOption,
     questions,
     selectedQuestion,
     elapsed,
@@ -73,10 +72,16 @@ function App() {
     return subscription.unsubscribe;
   }, [service]);
 
-  const [question, options, rightOption]: [string, string[], string] = [
+  const [question, options, rightOption, finalAnswer]: [
+    string,
+    string[],
+    string,
+    string
+  ] = [
     questions[selectedQuestion]?.title,
     questions[selectedQuestion]?.options,
     questions[selectedQuestion]?.rightOption,
+    questions[selectedQuestion]?.options[selectedOption],
   ];
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -183,7 +188,7 @@ function App() {
 
           {state.matches("doingTest") && (
             <Box>
-              {chosenOption === questions.length && (
+              {selectedQuestion === questions.length - 1 && (
                 <Center>
                   <Box
                     as="button"
@@ -236,7 +241,7 @@ function App() {
                       width="36"
                       p={4}
                       mt="6"
-                      disabled={selectedQuestion === question.length}
+                      disabled={selectedQuestion === questions.length - 1}
                       color="white"
                       fontWeight="bold"
                       borderRadius="md"
@@ -244,7 +249,9 @@ function App() {
                       _hover={{
                         bgGradient: "linear(to-r, red.500, yellow.500)",
                       }}
-                      onClick={() => send({ type: "NEXTQUESTION" })}
+                      onClick={() =>
+                        send({ type: "NEXTQUESTION", rightOption, finalAnswer })
+                      }
                     >
                       <Heading size="md">Next</Heading>
                     </Box>
@@ -273,7 +280,7 @@ function App() {
                 >
                   Progress
                 </Text>
-                <Progress value={chosenOption * 10} />
+                <Progress value={selectedOption * 10} />
               </Box>
             </Center>
           )}
@@ -306,7 +313,6 @@ function App() {
         )
         <ModalContent>
           <ModalHeader>{modalTitle}</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>
             <Text>{modalBody}</Text>
             <Text
@@ -322,6 +328,7 @@ function App() {
             <StatGroup>
               <Stat>
                 <StatLabel>Score</StatLabel>
+
                 <StatNumber>{correctAnswer * 10}</StatNumber>
                 <StatHelpText>
                   {isPassedTheTest ? (
@@ -355,7 +362,7 @@ function App() {
                   ) : isFailedTheTest ? (
                     <StatArrow type="decrease" />
                   ) : null}
-                  KKM 70
+                  Minimum 7 Correct
                 </StatHelpText>
               </Stat>
             </StatGroup>
@@ -396,7 +403,6 @@ function App() {
         />
         <ModalContent>
           <ModalHeader>Times Up!!!</ModalHeader>
-          <ModalCloseButton />
           <ModalBody>
             <Text>You've already passed the duration of this test</Text>
           </ModalBody>

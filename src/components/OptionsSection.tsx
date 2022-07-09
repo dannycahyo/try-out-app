@@ -23,7 +23,7 @@ const OptionsSection = ({
           display="flex"
           flexDir="column"
         >
-          {options.map((answer) => (
+          {options.map((answer, index) => (
             <Button
               key={answer}
               mt="4"
@@ -35,9 +35,9 @@ const OptionsSection = ({
                 bgGradient: "linear(to-r, red.500, yellow.500)",
               }}
               disabled={!state.matches("doingTest")}
-              onClick={() =>
-                send({ type: "CHOOSEANSWER", answer, rightOption })
-              }
+              onClick={() => {
+                send({ type: "CHOOSEANSWER", index });
+              }}
             >
               <Text
                 bgGradient="linear(to-l, #1A365D, #065666)"
