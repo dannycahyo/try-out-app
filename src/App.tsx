@@ -1,3 +1,6 @@
+// Todo => Fix The Progress Bar
+// Todo => Display the list of questions and its pagination
+// Todo => Handle The Bug In The Last Question && Handle The JSX After The Final Question
 import React from "react";
 import Layout from "./containers/Layout";
 import {
@@ -10,7 +13,6 @@ import {
   Heading,
   Grid,
   GridItem,
-  Progress,
   useDisclosure,
   ModalOverlay,
   Modal,
@@ -261,7 +263,8 @@ function App() {
             </Box>
           )}
 
-          {state.matches("doingTest") && (
+          {/* Progress Bar Feature */}
+          {/* {state.matches("doingTest") && (
             <Center>
               <Box
                 mt="8"
@@ -280,20 +283,15 @@ function App() {
                 >
                   Progress
                 </Text>
-                <Progress value={selectedOption * 10} />
+                <Progress value={chosenAnswer * 10} />
               </Box>
             </Center>
-          )}
+          )} */}
         </GridItem>
 
         <GridItem colSpan={3}>
           <QuestionSection question={question} />
-          <OptionsSection
-            options={options}
-            state={state}
-            send={send}
-            rightOption={rightOption}
-          />
+          <OptionsSection options={options} state={state} send={send} />
         </GridItem>
       </Grid>
 

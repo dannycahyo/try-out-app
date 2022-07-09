@@ -1,15 +1,14 @@
+import React from "react";
 import { Box, Button, Center, Text } from "@chakra-ui/react";
 
 const OptionsSection = ({
   options,
   send,
   state,
-  rightOption,
 }: {
   options: string[];
   state: any;
   send: any;
-  rightOption: string;
 }) => {
   return (
     <Box py="2">

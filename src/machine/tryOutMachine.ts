@@ -159,12 +159,10 @@ export const tryOutMachine = createMachine<Context>({
     }),
     nextQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion + 1,
-      correctAnswer: (ctx, event) => {
-        if (event.rightOption === event.finalAnswer) {
-          return ctx.correctAnswer + 1;
-        }
-        return ctx.correctAnswer;
-      },
+      correctAnswer: (ctx, event) =>
+        event.rightOption === event.finalAnswer
+          ? ctx.correctAnswer + 1
+          : ctx.correctAnswer,
     }),
     prevQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion - 1,
