@@ -1,4 +1,5 @@
 import { createMachine, assign } from "xstate";
+import { raise } from "xstate/lib/actions";
 
 type question = {
   title: string;
@@ -98,8 +99,11 @@ export const tryOutMachine = createMachine<Context>({
           },
         },
         overtime: {
-          always: {
-            target: "#evaluation",
+          on: {
+            SEERESULT: {
+              actions: raise("SUBMITANSWER"),
+              target: "#evaluation",
+            },
           },
         },
       },
@@ -161,7 +165,7 @@ export const tryOutMachine = createMachine<Context>({
     chooseAnswer: assign({
       chosenOption: (ctx) => ctx.chosenOption + 1,
       correctAnswer: (ctx, event) =>
-        event.answer === event.rightOption
+        event.option === event.rightOption
           ? ctx.correctAnswer + 1
           : ctx.correctAnswer,
     }),

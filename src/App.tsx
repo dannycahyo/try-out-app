@@ -113,41 +113,43 @@ function App() {
 
           <Center mt="4">
             <Flex>
-              <Box
-                borderWidth="2px"
-                borderRadius="lg"
-                overflow="hidden"
-                p="4"
-                width="40"
-                mr="8"
-              >
-                <Text
-                  color="red.400"
-                  fontSize="2xl"
-                  fontWeight="extrabold"
-                  textAlign="center"
+              {state.matches("questionsOK") && (
+                <Box
+                  borderWidth="2px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p="4"
+                  width="40"
+                  mr="8"
                 >
-                  Ready?
-                </Text>
-                <Center>
-                  <Box
-                    as="button"
-                    p={4}
-                    w="24"
-                    mt="6"
-                    color="white"
-                    fontWeight="bold"
-                    borderRadius="md"
-                    bgGradient="linear(to-r, blue.500, cyan.500)"
-                    _hover={{
-                      bgGradient: "linear(to-r, red.500, yellow.500)",
-                    }}
-                    onClick={() => send({ type: "STARTTEST" })}
+                  <Text
+                    color="red.400"
+                    fontSize="2xl"
+                    fontWeight="extrabold"
+                    textAlign="center"
                   >
-                    {state.matches("doingTest") ? "Fighting" : "Start"}
-                  </Box>
-                </Center>
-              </Box>
+                    Ready?
+                  </Text>
+                  <Center>
+                    <Box
+                      as="button"
+                      p={4}
+                      w="24"
+                      mt="6"
+                      color="white"
+                      fontWeight="bold"
+                      borderRadius="md"
+                      bgGradient="linear(to-r, blue.500, cyan.500)"
+                      _hover={{
+                        bgGradient: "linear(to-r, red.500, yellow.500)",
+                      }}
+                      onClick={() => send({ type: "STARTTEST" })}
+                    >
+                      Start
+                    </Box>
+                  </Center>
+                </Box>
+              )}
 
               <Box
                 borderWidth="2px"
@@ -379,6 +381,34 @@ function App() {
                 RETEST
               </Button>
             )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+
+      <Modal
+        isCentered
+        isOpen={state.matches("doingTest.overtime")}
+        onClose={onClose}
+      >
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(10px) hue-rotate(90deg)"
+        />
+        <ModalContent>
+          <ModalHeader>Times Up!!!</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>You've already passed the duration of this test</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              onClick={() => {
+                send({ type: "SEERESULT" });
+                onOpen();
+              }}
+            >
+              See Result
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
