@@ -2,7 +2,7 @@
     "questions": [
         {
             "title": "How's life?",
-            "correctAnswer": "So Excited",
+            "rightOption": "So Excited",
             "options": [
                 "B Aja",
                 "Super Duper",
@@ -13,7 +13,7 @@
         },
         {
             "title": "Deremmah Odik?",
-            "correctAnswer": "B Aja",
+            "rightOption": "B Aja",
             "options": [
                 "B Aja",
                 "Super Duper",
@@ -24,7 +24,7 @@
         },
         {
             "title": "Gimana kabar?",
-            "correctAnswer": "So Excited",
+            "rightOption": "So Excited",
             "options": [
                 "OK Fine",
                 "B Aja",
@@ -35,7 +35,7 @@
         },
         {
             "title": "Piye Kabare Cak?",
-            "correctAnswer": "OK Fine",
+            "rightOption": "OK Fine",
             "options": [
                 "B Aja",
                 "Super Duper",
@@ -46,7 +46,7 @@
         },
         {
             "title": "Gimana pas udah kelar ngengek?",
-            "correctAnswer": "All Good",
+            "rightOption": "All Good",
             "options": [
                 "OK Fine",
                 "B Aja",
@@ -57,7 +57,7 @@
         },
         {
             "title": "Koo gitu sih? Wdyt?",
-            "correctAnswer": "So Excited",
+            "rightOption": "So Excited",
             "options": [
                 "OK Fine",
                 "B Aja",
@@ -68,7 +68,7 @@
         },
         {
             "title": "Buntu aku cok, gimana ya?",
-            "correctAnswer": "OK Fine",
+            "rightOption": "OK Fine",
             "options": [
                 "B Aja",
                 "All Good",
@@ -79,7 +79,7 @@
         },
         {
             "title": "Hadeehh, capek cok. Kamu?",
-            "correctAnswer": "B Aja",
+            "rightOption": "B Aja",
             "options": [
                 "All Good",
                 "OK Fine",
@@ -90,7 +90,7 @@
         },
         {
             "title": "Sini cerita, gimana2?",
-            "correctAnswer": "OK Fine",
+            "rightOption": "OK Fine",
             "options": [
                 "Super Duper",
                 "OK Fine",
@@ -101,7 +101,7 @@
         },
         {
             "title": "Jangan lupa makan ya, OK?",
-            "correctAnswer": "Super Duper",
+            "rightOption": "Super Duper",
             "options": [
                 "B Aja",
                 "OK Fine",

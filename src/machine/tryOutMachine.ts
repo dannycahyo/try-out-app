@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 
 type question = {
   title: string;
-  correctAnswer: string;
+  rightOption: string;
   options: string[];
 };
 
@@ -24,13 +24,14 @@ const setTimer = (ctx: Context) => (send: any) => {
   return () => clearInterval(interval);
 };
 
+// Todo => Fix The Bug On The Choose Answer
 export const tryOutMachine = createMachine<Context>({
   id: "TryOut App",
   initial: "idle",
   context: {
     questions: [
       {
-        correctAnswer: "",
+        rightOption: "",
         options: [],
         title: "",
       },
@@ -63,6 +64,8 @@ export const tryOutMachine = createMachine<Context>({
       },
     },
     questionsOK: {
+      tags: ["questionsOK"],
+      id: "questionsOK",
       on: {
         STARTTEST: {
           actions: "setDuration",
@@ -75,9 +78,19 @@ export const tryOutMachine = createMachine<Context>({
         id: "setTimer",
         src: setTimer,
       },
-      always: {
-        target: "timesUp",
-        cond: "timerExpired",
+      initial: "normal",
+      states: {
+        normal: {
+          always: {
+            target: "overtime",
+            cond: "timerExpired",
+          },
+        },
+        overtime: {
+          always: {
+            target: "#evaluation",
+          },
+        },
       },
       on: {
         TICK: {
@@ -100,6 +113,8 @@ export const tryOutMachine = createMachine<Context>({
       },
     },
     evaluation: {
+      tags: ["evaluation"],
+      id: "evaluation",
       always: [
         {
           cond: "passTheKKM",
@@ -110,23 +125,18 @@ export const tryOutMachine = createMachine<Context>({
         },
       ],
     },
-    timesUp: {
-      type: "final",
+    passed: {
       on: {
-        RETEST: {
-          actions: "resetAnswer",
+        RESET: {
+          actions: "restartTheTest",
           target: "questionsOK",
         },
       },
     },
-    passed: {
-      type: "final",
-    },
     failed: {
-      type: "final",
       on: {
-        RETEST: {
-          actions: "resetAnswer",
+        RESET: {
+          actions: "restartTheTest",
           target: "questionsOK",
         },
       },
@@ -145,6 +155,21 @@ export const tryOutMachine = createMachine<Context>({
     }),
     prevQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion - 1,
+    }),
+    chooseAnswer: assign({
+      chosenOption: (ctx) => ctx.chosenOption + 1,
+      correctAnswer: (ctx, event) =>
+        event.answer === event.rightOption
+          ? ctx.correctAnswer + 1
+          : ctx.correctAnswer,
+    }),
+    restartTheTest: assign({
+      selectedQuestion: (ctx) => 0,
+      chosenOption: (ctx) => 0,
+      correctAnswer: (ctx) => 0,
+      elapsed: (ctx) => 0,
+      interval: (ctx) => 0.1,
+      duration: (ctx) => 0,
     }),
   },
   guards: {

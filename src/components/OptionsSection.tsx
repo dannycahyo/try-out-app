@@ -1,7 +1,16 @@
-import React from "react";
 import { Box, Button, Center, Text } from "@chakra-ui/react";
 
-const OptionsSection = ({ options }: { options: string[] }) => {
+const OptionsSection = ({
+  options,
+  send,
+  state,
+  rightOption,
+}: {
+  options: string[];
+  state: any;
+  send: any;
+  rightOption: string;
+}) => {
   return (
     <Box py="2">
       <Center>
@@ -19,12 +28,16 @@ const OptionsSection = ({ options }: { options: string[] }) => {
               key={answer}
               mt="4"
               py="10"
-              _focus={{
+              _focusWithin={{
                 transform: "scale(0.98)",
                 borderColor: "#bec3c9",
                 border: "10px",
                 bgGradient: "linear(to-r, red.500, yellow.500)",
               }}
+              disabled={!state.matches("doingTest")}
+              onClick={() =>
+                send({ type: "CHOOSEANSWER", answer, rightOption })
+              }
             >
               <Text
                 bgGradient="linear(to-l, #1A365D, #065666)"

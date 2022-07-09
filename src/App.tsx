@@ -10,6 +10,22 @@ import {
   Heading,
   Grid,
   GridItem,
+  Progress,
+  useDisclosure,
+  ModalOverlay,
+  Modal,
+  ModalContent,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  ModalHeader,
+  Button,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  StatGroup,
 } from "@chakra-ui/react";
 import QuestionSection from "./components/QuestionSection";
 import OptionsSection from "./components/OptionsSection";
@@ -20,13 +36,25 @@ import { useQuery } from "react-query";
 
 function App() {
   const { data, status } = useQuery("questions", getQuestions);
-  const [state, send] = useMachine(tryOutMachine);
-  const { chosenOption, questions, selectedQuestion, elapsed, duration } =
-    state.context;
+  const [state, send, service] = useMachine(tryOutMachine);
+  const {
+    chosenOption,
+    questions,
+    selectedQuestion,
+    elapsed,
+    duration,
+    correctAnswer,
+  } = state.context;
 
+  const isPassedTheTest = state.matches("passed");
+  const isFailedTheTest = state.matches("failed");
+
+  // Init machine transititions
   React.useEffect(() => {
-    send({ type: "FETCHING" });
-  }, [send]);
+    if (state.matches("idle")) {
+      send({ type: "FETCHING" });
+    }
+  }, [send, state]);
 
   React.useEffect(() => {
     if (status === "loading") {
@@ -38,14 +66,34 @@ function App() {
     }
   }, [data, send, status]);
 
-  console.log(state.value);
-  console.log("SEE THE DURATION", duration);
-  console.log("SEE THE TIMER", elapsed);
+  // Debugguing Purposes
+  React.useEffect(() => {
+    const subscription = service.subscribe((state) => {
+      console.log(state);
+    });
 
-  const [question, options]: [string, string[]] = [
+    return subscription.unsubscribe;
+  }, [service]);
+
+  const [question, options, rightOption]: [string, string[], string] = [
     questions[selectedQuestion]?.title,
     questions[selectedQuestion]?.options,
+    questions[selectedQuestion]?.rightOption,
   ];
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  const modalTitle = isPassedTheTest
+    ? "Congratulations"
+    : isFailedTheTest
+    ? "Upsss, Sorry. You Failed!"
+    : "";
+
+  const modalBody = isPassedTheTest
+    ? "You've already pass the test"
+    : isFailedTheTest
+    ? "That's totally okay, Let's try again!"
+    : "";
 
   return (
     <Layout>
@@ -64,6 +112,7 @@ function App() {
           >
             Let's Get Started
           </Text>
+
           <Center mt="4">
             <Flex>
               <Box
@@ -97,7 +146,7 @@ function App() {
                     }}
                     onClick={() => send({ type: "STARTTEST" })}
                   >
-                    Start
+                    {state.matches("doingTest") ? "Fighting" : "Start"}
                   </Box>
                 </Center>
               </Box>
@@ -131,14 +180,14 @@ function App() {
               </Box>
             </Flex>
           </Center>
+
           {state.matches("doingTest") && (
             <Box>
-              {chosenOption === questions.length ? (
+              {chosenOption === questions.length && (
                 <Center>
                   <Box
                     as="button"
                     width="xs"
-                    mr={"8"}
                     p={4}
                     mt="6"
                     color="white"
@@ -148,63 +197,193 @@ function App() {
                     _hover={{
                       bgGradient: "linear(to-r, red.500, yellow.500)",
                     }}
+                    onClick={() => {
+                      send({ type: "SUBMITANSWER" });
+                      onOpen();
+                    }}
                   >
                     <Heading size="md">Submit</Heading>
                   </Box>
                 </Center>
-              ) : (
-                <Center mt="4">
-                  <Flex>
-                    <Center>
-                      <Box
-                        as="button"
-                        width="36"
-                        mr={"8"}
-                        p={4}
-                        mt="6"
-                        color="white"
-                        fontWeight="bold"
-                        borderRadius="md"
-                        bgGradient="linear(to-r, blue.500, cyan.500)"
-                        _hover={{
-                          bgGradient: "linear(to-r, red.500, yellow.500)",
-                        }}
-                        onClick={() => send({ type: "PREVQUESTION" })}
-                      >
-                        <Heading size="md">Prev</Heading>
-                      </Box>
-                    </Center>
-
-                    <Center>
-                      <Box
-                        as="button"
-                        width="36"
-                        p={4}
-                        mt="6"
-                        color="white"
-                        fontWeight="bold"
-                        borderRadius="md"
-                        bgGradient="linear(to-r, blue.500, cyan.500)"
-                        _hover={{
-                          bgGradient: "linear(to-r, red.500, yellow.500)",
-                        }}
-                        onClick={() => send({ type: "NEXTQUESTION" })}
-                      >
-                        <Heading size="md">Next</Heading>
-                      </Box>
-                    </Center>
-                  </Flex>
-                </Center>
               )}
+
+              <Center mt="4">
+                <Flex>
+                  <Center>
+                    <Box
+                      as="button"
+                      width="36"
+                      mr={"8"}
+                      p={4}
+                      mt="6"
+                      disabled={selectedQuestion === 0}
+                      color="white"
+                      fontWeight="bold"
+                      borderRadius="md"
+                      bgGradient="linear(to-r, blue.500, cyan.500)"
+                      _hover={{
+                        bgGradient: "linear(to-r, red.500, yellow.500)",
+                      }}
+                      onClick={() => send({ type: "PREVQUESTION" })}
+                    >
+                      <Heading size="md">Prev</Heading>
+                    </Box>
+                  </Center>
+
+                  <Center>
+                    <Box
+                      as="button"
+                      width="36"
+                      p={4}
+                      mt="6"
+                      disabled={selectedQuestion === question.length}
+                      color="white"
+                      fontWeight="bold"
+                      borderRadius="md"
+                      bgGradient="linear(to-r, blue.500, cyan.500)"
+                      _hover={{
+                        bgGradient: "linear(to-r, red.500, yellow.500)",
+                      }}
+                      onClick={() => send({ type: "NEXTQUESTION" })}
+                    >
+                      <Heading size="md">Next</Heading>
+                    </Box>
+                  </Center>
+                </Flex>
+              </Center>
             </Box>
+          )}
+
+          {state.matches("doingTest") && (
+            <Center>
+              <Box
+                mt="8"
+                borderWidth="2px"
+                borderRadius="lg"
+                overflow="hidden"
+                p="4"
+                width="60"
+              >
+                <Text
+                  color="red.400"
+                  fontSize="2xl"
+                  fontWeight="extrabold"
+                  textAlign="center"
+                  mb="4"
+                >
+                  Progress
+                </Text>
+                <Progress value={chosenOption * 10} />
+              </Box>
+            </Center>
           )}
         </GridItem>
 
         <GridItem colSpan={3}>
           <QuestionSection question={question} />
-          <OptionsSection options={options} />
+          <OptionsSection
+            options={options}
+            state={state}
+            send={send}
+            rightOption={rightOption}
+          />
         </GridItem>
       </Grid>
+
+      <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
+        {isPassedTheTest} && (
+        <ModalOverlay
+          bg="none"
+          backdropFilter="auto"
+          backdropInvert="80%"
+          backdropBlur="2px"
+        />
+        ){isFailedTheTest} && (
+        <ModalOverlay
+          bg="blackAlpha.300"
+          backdropFilter="blur(10px) hue-rotate(90deg)"
+        />
+        )
+        <ModalContent>
+          <ModalHeader>{modalTitle}</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>{modalBody}</Text>
+            <Text
+              bgGradient="linear(to-l, #7928CA, #FF0080)"
+              bgClip="text"
+              fontSize="4xl"
+              fontWeight="extrabold"
+              textAlign="center"
+              my="4"
+            >
+              Summary
+            </Text>
+            <StatGroup>
+              <Stat>
+                <StatLabel>Score</StatLabel>
+                <StatNumber>{correctAnswer * 10}</StatNumber>
+                <StatHelpText>
+                  {isPassedTheTest ? (
+                    <StatArrow type="increase" />
+                  ) : isFailedTheTest ? (
+                    <StatArrow type="decrease" />
+                  ) : null}
+                  KKM 70
+                </StatHelpText>
+              </Stat>
+
+              <Stat>
+                <StatLabel>Time</StatLabel>
+                <StatNumber>{Math.floor(elapsed)}</StatNumber>
+                <StatHelpText>
+                  {isPassedTheTest ? (
+                    <StatArrow type="increase" />
+                  ) : isFailedTheTest ? (
+                    <StatArrow type="decrease" />
+                  ) : null}
+                  Duration {duration}
+                </StatHelpText>
+              </Stat>
+
+              <Stat>
+                <StatLabel>Correct Answer</StatLabel>
+                <StatNumber>{correctAnswer}</StatNumber>
+                <StatHelpText>
+                  {isPassedTheTest ? (
+                    <StatArrow type="increase" />
+                  ) : isFailedTheTest ? (
+                    <StatArrow type="decrease" />
+                  ) : null}
+                  KKM 70
+                </StatHelpText>
+              </Stat>
+            </StatGroup>
+          </ModalBody>
+          <ModalFooter>
+            {isPassedTheTest && (
+              <Button
+                onClick={() => {
+                  send({ type: "RESET" });
+                  onClose();
+                }}
+              >
+                Close
+              </Button>
+            )}
+            {isFailedTheTest && (
+              <Button
+                onClick={() => {
+                  send({ type: "RESET" });
+                  onClose();
+                }}
+              >
+                RETEST
+              </Button>
+            )}
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Layout>
   );
 }
