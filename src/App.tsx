@@ -27,6 +27,10 @@ import {
   StatHelpText,
   StatArrow,
   StatGroup,
+  Alert,
+  AlertIcon,
+  AlertTitle,
+  AlertDescription,
 } from "@chakra-ui/react";
 import QuestionSection from "./components/QuestionSection";
 import OptionsSection from "./components/OptionsSection";
@@ -190,30 +194,6 @@ function App() {
 
           {state.matches("doingTest") && (
             <Box>
-              {selectedQuestion === questions.length - 1 && (
-                <Center>
-                  <Box
-                    as="button"
-                    width="xs"
-                    p={4}
-                    mt="6"
-                    color="white"
-                    fontWeight="bold"
-                    borderRadius="md"
-                    bgGradient="linear(to-r, blue.500, cyan.500)"
-                    _hover={{
-                      bgGradient: "linear(to-r, red.500, yellow.500)",
-                    }}
-                    onClick={() => {
-                      send({ type: "SUBMITANSWER" });
-                      onOpen();
-                    }}
-                  >
-                    <Heading size="md">Submit</Heading>
-                  </Box>
-                </Center>
-              )}
-
               <Center mt="4">
                 <Flex>
                   <Center>
@@ -243,7 +223,7 @@ function App() {
                       width="36"
                       p={4}
                       mt="6"
-                      disabled={selectedQuestion === questions.length - 1}
+                      disabled={selectedQuestion === questions.length}
                       color="white"
                       fontWeight="bold"
                       borderRadius="md"
@@ -290,8 +270,54 @@ function App() {
         </GridItem>
 
         <GridItem colSpan={3}>
-          <QuestionSection question={question} />
-          <OptionsSection options={options} state={state} send={send} />
+          {selectedQuestion === questions.length ? (
+            <Center>
+              <Alert
+                status="info"
+                variant="subtle"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                textAlign="center"
+                width="xl"
+                borderRadius="4"
+                minH="xs"
+                marginLeft="4"
+              >
+                <AlertIcon mt="4" boxSize="40px" mr={0} />
+                <AlertTitle mt={4} mb={1} fontSize="lg">
+                  Have you already answered all of the questions?
+                </AlertTitle>
+                <AlertDescription maxWidth="sm">
+                  Please kindly check again all of your answer
+                </AlertDescription>
+
+                <Box
+                  as="button"
+                  p={4}
+                  mt="6"
+                  color="white"
+                  fontWeight="bold"
+                  borderRadius="md"
+                  bgGradient="linear(to-r, blue.500, cyan.500)"
+                  _hover={{
+                    bgGradient: "linear(to-r, red.500, yellow.500)",
+                  }}
+                  onClick={() => {
+                    send({ type: "SUBMITANSWER" });
+                    onOpen();
+                  }}
+                >
+                  <Heading size="md">Submit</Heading>
+                </Box>
+              </Alert>
+            </Center>
+          ) : (
+            <>
+              <QuestionSection question={question} />
+              <OptionsSection options={options} state={state} send={send} />
+            </>
+          )}
         </GridItem>
       </Grid>
 
