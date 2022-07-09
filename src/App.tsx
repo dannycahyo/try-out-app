@@ -1,6 +1,5 @@
 // Todo => Fix The Progress Bar
 // Todo => Display the list of questions and its pagination
-// Todo => Handle The Bug In The Last Question && Handle The JSX After The Final Question
 import React from "react";
 import Layout from "./containers/Layout";
 import {
