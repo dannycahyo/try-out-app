@@ -51,10 +51,8 @@ function App() {
 
   // Init machine transititions
   React.useEffect(() => {
-    if (state.matches("idle")) {
-      send({ type: "FETCHING" });
-    }
-  }, [send, state]);
+    send({ type: "FETCHING" });
+  }, [send]);
 
   React.useEffect(() => {
     if (status === "loading") {

@@ -85,6 +85,17 @@ export const tryOutMachine = createMachine<Context>({
             target: "overtime",
             cond: "timerExpired",
           },
+          on: {
+            CHOOSEANSWER: {
+              actions: "chooseAnswer",
+            },
+            NEXTQUESTION: {
+              actions: "nextQuestion",
+            },
+            PREVQUESTION: {
+              actions: "prevQuestion",
+            },
+          },
         },
         overtime: {
           always: {
@@ -98,17 +109,8 @@ export const tryOutMachine = createMachine<Context>({
             elapsed: (ctx) => ctx.elapsed + ctx.interval,
           }),
         },
-        CHOOSEANSWER: {
-          actions: "chooseAnswer",
-        },
         SUBMITANSWER: {
           target: "evaluation",
-        },
-        NEXTQUESTION: {
-          actions: "nextQuestion",
-        },
-        PREVQUESTION: {
-          actions: "prevQuestion",
         },
       },
     },
