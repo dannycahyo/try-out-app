@@ -35,7 +35,7 @@ const OptionsSection = ({
               }}
               disabled={!state.matches("doingTest")}
               onClick={() => {
-                send({ type: "CHOOSEANSWER", index });
+                send({ type: "CHOOSEOPTION", index });
               }}
             >
               <Text

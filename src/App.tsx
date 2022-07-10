@@ -1,5 +1,5 @@
 // Todo => Fix The Progress Bar
-// Todo => Display the list of questions and its pagination
+// Todo => Fix Bug If The User Change Back Their Answer
 import React from "react";
 import Layout from "./containers/Layout";
 import {
@@ -30,6 +30,9 @@ import {
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  Stack,
+  Wrap,
+  WrapItem,
 } from "@chakra-ui/react";
 import QuestionSection from "./components/QuestionSection";
 import OptionsSection from "./components/OptionsSection";
@@ -71,7 +74,7 @@ function App() {
   // Debugguing Purposes
   React.useEffect(() => {
     const subscription = service.subscribe((state) => {
-      console.log(state);
+      console.log(state.context.selectedQuestion);
     });
 
     return subscription.unsubscribe;
@@ -190,6 +193,63 @@ function App() {
               </Box>
             </Flex>
           </Center>
+
+          {state.matches("doingTest") && (
+            <Box
+              borderWidth="2px"
+              borderRadius="lg"
+              overflow="hidden"
+              p="4"
+              w="340px"
+              mt="8"
+              ml="10"
+            >
+              <Stack direction="column">
+                <Wrap spacing={4}>
+                  {questions.map((question, index) => (
+                    <WrapItem>
+                      <Button
+                        color="red.400"
+                        variant="outline"
+                        onClick={() =>
+                          send({
+                            type: "CHOOSEQUESTION",
+                            index,
+                            rightOption,
+                            finalAnswer,
+                          })
+                        }
+                      >
+                        {index + 1}
+                      </Button>
+                    </WrapItem>
+                  ))}
+                </Wrap>
+              </Stack>
+            </Box>
+          )}
+
+          {state.matches("doingTest") && (
+            <Center>
+              <Box
+                as="button"
+                p={4}
+                mt="6"
+                color="white"
+                fontWeight="bold"
+                borderRadius="md"
+                bgGradient="linear(to-r, blue.500, cyan.500)"
+                _hover={{
+                  bgGradient: "linear(to-r, red.500, yellow.500)",
+                }}
+                onClick={() => {
+                  send({ type: "PROCEDTOSUBMIT" });
+                }}
+              >
+                <Heading size="md">Proceed To Submit</Heading>
+              </Box>
+            </Center>
+          )}
 
           {state.matches("doingTest") && (
             <Box>

@@ -88,11 +88,17 @@ export const tryOutMachine = createMachine<Context>({
             cond: "timerExpired",
           },
           on: {
-            CHOOSEANSWER: {
-              actions: "chooseAnswer",
+            CHOOSEQUESTION: {
+              actions: ["chooseQuestion", "chooseAnswer"],
+            },
+            CHOOSEOPTION: {
+              actions: "chooseOption",
+            },
+            PROCEDTOSUBMIT: {
+              actions: "procedToSubmit",
             },
             NEXTQUESTION: {
-              actions: "nextQuestion",
+              actions: ["nextQuestion", "chooseAnswer"],
             },
             PREVQUESTION: {
               actions: "prevQuestion",
@@ -159,16 +165,24 @@ export const tryOutMachine = createMachine<Context>({
     }),
     nextQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion + 1,
-      correctAnswer: (ctx, event) =>
-        event.rightOption === event.finalAnswer
-          ? ctx.correctAnswer + 1
-          : ctx.correctAnswer,
     }),
     prevQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion - 1,
     }),
-    chooseAnswer: assign({
+    chooseQuestion: assign({
+      selectedQuestion: (ctx, event) => event.index,
+    }),
+    procedToSubmit: assign({
+      selectedQuestion: (ctx) => 10,
+    }),
+    chooseOption: assign({
       selectedOption: (ctx, event) => event.index,
+    }),
+    chooseAnswer: assign({
+      correctAnswer: (ctx, event) =>
+        event.rightOption === event.finalAnswer
+          ? ctx.correctAnswer + 1
+          : ctx.correctAnswer,
     }),
     restartTheTest: assign({
       selectedQuestion: (ctx) => 0,
