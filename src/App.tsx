@@ -1,17 +1,12 @@
-// Todo => Fix The Progress Bar
-// Todo => Fix Bug If The User Change Back Their Answer
 import React from "react";
 import Layout from "./containers/Layout";
 import {
   Box,
   Text,
   Center,
-  CircularProgress,
-  CircularProgressLabel,
   Flex,
   Heading,
-  Grid,
-  GridItem,
+  SimpleGrid,
   useDisclosure,
   ModalOverlay,
   Modal,
@@ -20,12 +15,6 @@ import {
   ModalFooter,
   ModalHeader,
   Button,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  StatArrow,
-  StatGroup,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -36,6 +25,8 @@ import {
 } from "@chakra-ui/react";
 import QuestionSection from "./components/QuestionSection";
 import OptionsSection from "./components/OptionsSection";
+import TimerSection from "./components/TimerSection";
+import StatisticSection from "./components/StatisticSection";
 import { tryOutMachine } from "./machine/tryOutMachine";
 import { useMachine } from "@xstate/react";
 import { getQuestions } from "./api/getQuestions";
@@ -108,12 +99,13 @@ function App() {
 
   return (
     <Layout>
-      <Grid
-        templateRows="repeat(2, 1fr)"
-        templateColumns="repeat(5, 1fr)"
-        py="8"
+      <SimpleGrid
+        columns={2}
+        spacingX="20px"
+        spacingY="20px"
+        px={["6", "8", "10", "12", "32"]}
       >
-        <GridItem rowSpan={2} colSpan={2} pl="40">
+        <Box py="12">
           <Text
             bgGradient="linear(to-l, #90CDF4, #0BC5EA)"
             bgClip="text"
@@ -164,171 +156,129 @@ function App() {
                 </Box>
               )}
 
-              <Box
-                borderWidth="2px"
-                borderRadius="lg"
-                overflow="hidden"
-                p="4"
-                width="40"
-              >
-                <Text
-                  color="red.400"
-                  fontSize="2xl"
-                  fontWeight="extrabold"
-                  textAlign="center"
-                >
-                  Timer
-                </Text>
-                <Center>
-                  <CircularProgress
-                    value={Math.floor(elapsed)}
-                    size="100px"
-                    thickness="6px"
-                  >
-                    <CircularProgressLabel color="white">
-                      {Math.floor(elapsed)}
-                    </CircularProgressLabel>
-                  </CircularProgress>
-                </Center>
-              </Box>
+              <TimerSection elapsed={elapsed} />
             </Flex>
           </Center>
 
           {state.matches("doingTest") && (
-            <Box
-              borderWidth="2px"
-              borderRadius="lg"
-              overflow="hidden"
-              p="4"
-              w="340px"
-              mt="8"
-              ml="10"
-            >
-              <Stack direction="column">
-                <Wrap spacing={4}>
-                  {questions.map((question, index) => (
-                    <WrapItem>
-                      <Button
-                        color="red.400"
-                        variant="outline"
+            <>
+              <Center>
+                <Box
+                  borderWidth="2px"
+                  borderRadius="lg"
+                  overflow="hidden"
+                  p="4"
+                  w="340px"
+                  mt="8"
+                >
+                  <Stack direction="column">
+                    <Wrap spacing={4}>
+                      {questions.map((question, index) => (
+                        <WrapItem>
+                          <Button
+                            color="red.400"
+                            variant="outline"
+                            _focusWithin={{
+                              transform: "scale(0.98)",
+                              borderColor: "#bec3c9",
+                              border: "10px",
+                              bgGradient: "linear(to-r, red.500, yellow.500)",
+                              color: "white",
+                            }}
+                            onClick={() =>
+                              send({
+                                type: "CHOOSEQUESTION",
+                                index,
+                                rightOption,
+                                finalAnswer,
+                              })
+                            }
+                          >
+                            {index + 1}
+                          </Button>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </Stack>
+                </Box>
+              </Center>
+              <Box>
+                <Center mt="4">
+                  <Flex>
+                    <Center>
+                      <Box
+                        as="button"
+                        width="36"
+                        mr={"8"}
+                        p={4}
+                        mt="6"
+                        disabled={selectedQuestion === 0}
+                        color="white"
+                        fontWeight="bold"
+                        borderRadius="md"
+                        bgGradient="linear(to-r, blue.500, cyan.500)"
+                        _hover={{
+                          bgGradient: "linear(to-r, red.500, yellow.500)",
+                        }}
+                        onClick={() => send({ type: "PREVQUESTION" })}
+                      >
+                        <Heading size="md">Prev</Heading>
+                      </Box>
+                    </Center>
+
+                    <Center>
+                      <Box
+                        as="button"
+                        width="36"
+                        p={4}
+                        mt="6"
+                        disabled={selectedQuestion === questions.length}
+                        color="white"
+                        fontWeight="bold"
+                        borderRadius="md"
+                        bgGradient="linear(to-r, blue.500, cyan.500)"
+                        _hover={{
+                          bgGradient: "linear(to-r, red.500, yellow.500)",
+                        }}
                         onClick={() =>
                           send({
-                            type: "CHOOSEQUESTION",
-                            index,
+                            type: "NEXTQUESTION",
                             rightOption,
                             finalAnswer,
                           })
                         }
                       >
-                        {index + 1}
-                      </Button>
-                    </WrapItem>
-                  ))}
-                </Wrap>
-              </Stack>
-            </Box>
-          )}
-
-          {state.matches("doingTest") && (
-            <Center>
-              <Box
-                as="button"
-                p={4}
-                mt="6"
-                color="white"
-                fontWeight="bold"
-                borderRadius="md"
-                bgGradient="linear(to-r, blue.500, cyan.500)"
-                _hover={{
-                  bgGradient: "linear(to-r, red.500, yellow.500)",
-                }}
-                onClick={() => {
-                  send({ type: "PROCEDTOSUBMIT" });
-                }}
-              >
-                <Heading size="md">Proceed To Submit</Heading>
+                        <Heading size="md">Next</Heading>
+                      </Box>
+                    </Center>
+                  </Flex>
+                </Center>
               </Box>
-            </Center>
-          )}
 
-          {state.matches("doingTest") && (
-            <Box>
-              <Center mt="4">
-                <Flex>
-                  <Center>
-                    <Box
-                      as="button"
-                      width="36"
-                      mr={"8"}
-                      p={4}
-                      mt="6"
-                      disabled={selectedQuestion === 0}
-                      color="white"
-                      fontWeight="bold"
-                      borderRadius="md"
-                      bgGradient="linear(to-r, blue.500, cyan.500)"
-                      _hover={{
-                        bgGradient: "linear(to-r, red.500, yellow.500)",
-                      }}
-                      onClick={() => send({ type: "PREVQUESTION" })}
-                    >
-                      <Heading size="md">Prev</Heading>
-                    </Box>
-                  </Center>
-
-                  <Center>
-                    <Box
-                      as="button"
-                      width="36"
-                      p={4}
-                      mt="6"
-                      disabled={selectedQuestion === questions.length}
-                      color="white"
-                      fontWeight="bold"
-                      borderRadius="md"
-                      bgGradient="linear(to-r, blue.500, cyan.500)"
-                      _hover={{
-                        bgGradient: "linear(to-r, red.500, yellow.500)",
-                      }}
-                      onClick={() =>
-                        send({ type: "NEXTQUESTION", rightOption, finalAnswer })
-                      }
-                    >
-                      <Heading size="md">Next</Heading>
-                    </Box>
-                  </Center>
-                </Flex>
-              </Center>
-            </Box>
-          )}
-
-          {/* Progress Bar Feature */}
-          {/* {state.matches("doingTest") && (
-            <Center>
-              <Box
-                mt="8"
-                borderWidth="2px"
-                borderRadius="lg"
-                overflow="hidden"
-                p="4"
-                width="60"
-              >
-                <Text
-                  color="red.400"
-                  fontSize="2xl"
-                  fontWeight="extrabold"
-                  textAlign="center"
-                  mb="4"
+              <Center>
+                <Box
+                  as="button"
+                  p={4}
+                  mt="6"
+                  color="white"
+                  fontWeight="bold"
+                  borderRadius="md"
+                  bgGradient="linear(to-r, blue.500, cyan.500)"
+                  _hover={{
+                    bgGradient: "linear(to-r, red.500, yellow.500)",
+                  }}
+                  onClick={() => {
+                    send({ type: "PROCEDTOSUBMIT" });
+                  }}
                 >
-                  Progress
-                </Text>
-                <Progress value={chosenAnswer * 10} />
-              </Box>
-            </Center>
-          )} */}
-        </GridItem>
+                  <Heading size="md">Proceed To Submit</Heading>
+                </Box>
+              </Center>
+            </>
+          )}
+        </Box>
 
-        <GridItem colSpan={3}>
+        <Box py="12">
           {selectedQuestion === questions.length ? (
             <Center>
               <Alert
@@ -377,8 +327,8 @@ function App() {
               <OptionsSection options={options} state={state} send={send} />
             </>
           )}
-        </GridItem>
-      </Grid>
+        </Box>
+      </SimpleGrid>
 
       <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
         {isPassedTheTest} && (
@@ -408,47 +358,13 @@ function App() {
             >
               Summary
             </Text>
-            <StatGroup>
-              <Stat>
-                <StatLabel>Score</StatLabel>
-
-                <StatNumber>{correctAnswer * 10}</StatNumber>
-                <StatHelpText>
-                  {isPassedTheTest ? (
-                    <StatArrow type="increase" />
-                  ) : isFailedTheTest ? (
-                    <StatArrow type="decrease" />
-                  ) : null}
-                  KKM 70
-                </StatHelpText>
-              </Stat>
-
-              <Stat>
-                <StatLabel>Time</StatLabel>
-                <StatNumber>{Math.floor(elapsed)}</StatNumber>
-                <StatHelpText>
-                  {isPassedTheTest ? (
-                    <StatArrow type="increase" />
-                  ) : isFailedTheTest ? (
-                    <StatArrow type="decrease" />
-                  ) : null}
-                  Duration {duration}
-                </StatHelpText>
-              </Stat>
-
-              <Stat>
-                <StatLabel>Correct Answer</StatLabel>
-                <StatNumber>{correctAnswer}</StatNumber>
-                <StatHelpText>
-                  {isPassedTheTest ? (
-                    <StatArrow type="increase" />
-                  ) : isFailedTheTest ? (
-                    <StatArrow type="decrease" />
-                  ) : null}
-                  Minimum 7 Correct
-                </StatHelpText>
-              </Stat>
-            </StatGroup>
+            <StatisticSection
+              isFailedTheTest={isFailedTheTest}
+              isPassedTheTest={isPassedTheTest}
+              correctAnswer={correctAnswer}
+              duration={duration}
+              elapsed={elapsed}
+            />
           </ModalBody>
           <ModalFooter>
             {isPassedTheTest && (

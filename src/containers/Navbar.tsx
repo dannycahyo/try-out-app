@@ -1,12 +1,4 @@
-import React from "react";
-import {
-  Flex,
-  Box,
-  Heading,
-  Spacer,
-  ButtonGroup,
-  IconButton,
-} from "@chakra-ui/react";
+import { Flex, Box, Heading, Spacer, Button } from "@chakra-ui/react";
 import { FaGithub } from "react-icons/fa";
 
 const Navbar = () => {
@@ -18,20 +10,16 @@ const Navbar = () => {
         </Heading>
       </Box>
       <Spacer />
-      <Box>
-        <ButtonGroup pl="2" bg="white" borderRadius="base">
-          <Heading size="md" mt="2">
-            Github Repository
-          </Heading>
-          <IconButton
-            bg="white"
-            as="a"
-            href="#"
-            aria-label="GitHub"
-            icon={<FaGithub fontSize="1.25rem" />}
-          />
-        </ButtonGroup>
-      </Box>
+      {/* Todo => Update The Link Once The Project Uploaded */}
+      <Button
+        rightIcon={<FaGithub />}
+        color="black"
+        background="white"
+        as="a"
+        href="https://github.com/"
+      >
+        Github Repository
+      </Button>
     </Flex>
   );
 };

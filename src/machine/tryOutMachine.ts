@@ -25,7 +25,6 @@ const setTimer = (ctx: Context) => (send: any) => {
   return () => clearInterval(interval);
 };
 
-// Todo => Find Proper Evaluation Mechanism Based On The Questions Length}
 export const tryOutMachine = createMachine<Context>({
   id: "TryOut App",
   initial: "idle",
@@ -38,8 +37,7 @@ export const tryOutMachine = createMachine<Context>({
       },
     ],
     selectedQuestion: 0,
-    // Todo => Remove the hacky way (99) once the alternative bug fixing is found
-    selectedOption: 99,
+    selectedOption: 0,
     correctAnswer: 0,
     elapsed: 0,
     interval: 0.1,

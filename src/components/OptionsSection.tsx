@@ -22,9 +22,9 @@ const OptionsSection = ({
           display="flex"
           flexDir="column"
         >
-          {options.map((answer, index) => (
+          {options.map((option, index) => (
             <Button
-              key={answer}
+              key={option}
               mt="4"
               py="10"
               _focusWithin={{
@@ -45,7 +45,7 @@ const OptionsSection = ({
                 fontWeight="extrabold"
                 textAlign="center"
               >
-                {answer}
+                {option}
               </Text>
             </Button>
           ))}
