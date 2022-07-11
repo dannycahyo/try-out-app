@@ -45,7 +45,7 @@ export const Footer = () => (
         </ButtonGroup>
       </Stack>
       <Text fontSize="sm" color="subtle">
-        &copy; 2022 Simple Try Out App, Inc. All rights reserved.
+        &copy; 2022 Try Out App, Inc. All rights reserved.
       </Text>
     </Stack>
   </Box>
