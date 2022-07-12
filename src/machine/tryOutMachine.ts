@@ -1,4 +1,4 @@
-import { createMachine, assign } from "xstate";
+import { createMachine, assign, Sender } from "xstate";
 
 type question = {
   title: string;
@@ -16,7 +16,7 @@ type Context = {
   duration: number;
 };
 
-type MachineEvents =
+type TryOutMachineEvents =
   | { type: "FETCHING" }
   | { type: "SUCCESS"; data: question[] }
   | { type: "REFETCH" }
@@ -37,7 +37,7 @@ type MachineEvents =
   | { type: "SUBMITANSWER" }
   | { type: "RESET" };
 
-const setTimer = (ctx: Context) => (send: any) => {
+const setTimer = (ctx: Context) => (send: Sender<TryOutMachineEvents>) => {
   const interval = setInterval(() => {
     send("TICK");
   }, ctx.interval * 1000);
@@ -49,7 +49,7 @@ export const tryOutMachine = createMachine({
   tsTypes: {} as import("./tryOutMachine.typegen").Typegen0,
   schema: {
     context: {} as Context,
-    events: {} as MachineEvents,
+    events: {} as TryOutMachineEvents,
   },
   id: "TryOut App",
   initial: "idle",
