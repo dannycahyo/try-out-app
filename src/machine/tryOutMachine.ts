@@ -1,5 +1,4 @@
 import { createMachine, assign } from "xstate";
-import { raise } from "xstate/lib/actions";
 
 type question = {
   title: string;
@@ -7,7 +6,7 @@ type question = {
   options: string[];
 };
 
-interface Context {
+type Context = {
   questions: question[];
   selectedQuestion: number;
   selectedOption: number;
@@ -15,7 +14,28 @@ interface Context {
   elapsed: number;
   interval: number;
   duration: number;
-}
+};
+
+type MachineEvents =
+  | { type: "FETCHING" }
+  | { type: "SUCCESS"; data: question[] }
+  | { type: "REFETCH" }
+  | { type: "ERROR" }
+  | { type: "STARTTEST" }
+  | {
+      type: "CHOOSEQUESTION";
+      index: number;
+      rightOption: string;
+      finalAnswer: string;
+    }
+  | { type: "CHOOSEOPTION"; index: number }
+  | { type: "PROCEDTOSUBMIT" }
+  | { type: "NEXTQUESTION"; rightOption: string; finalAnswer: string }
+  | { type: "PREVQUESTION" }
+  | { type: "SEERESULT" }
+  | { type: "TICK" }
+  | { type: "SUBMITANSWER" }
+  | { type: "RESET" };
 
 const setTimer = (ctx: Context) => (send: any) => {
   const interval = setInterval(() => {
@@ -25,7 +45,12 @@ const setTimer = (ctx: Context) => (send: any) => {
   return () => clearInterval(interval);
 };
 
-export const tryOutMachine = createMachine<Context>({
+export const tryOutMachine = createMachine({
+  tsTypes: {} as import("./tryOutMachine.typegen").Typegen0,
+  schema: {
+    context: {} as Context,
+    events: {} as MachineEvents,
+  },
   id: "TryOut App",
   initial: "idle",
   context: {
@@ -106,7 +131,6 @@ export const tryOutMachine = createMachine<Context>({
         overtime: {
           on: {
             SEERESULT: {
-              actions: raise("SUBMITANSWER"),
               target: "#evaluation",
             },
           },
@@ -114,9 +138,7 @@ export const tryOutMachine = createMachine<Context>({
       },
       on: {
         TICK: {
-          actions: assign({
-            elapsed: (ctx) => ctx.elapsed + ctx.interval,
-          }),
+          actions: "startTimer",
         },
         SUBMITANSWER: {
           target: "evaluation",
@@ -158,8 +180,11 @@ export const tryOutMachine = createMachine<Context>({
     assignQuestionsData: assign({
       questions: (ctx, event) => event.data,
     }),
+    startTimer: assign({
+      elapsed: (ctx) => ctx.elapsed + ctx.interval,
+    }),
     setDuration: assign({
-      duration: (ctx, event) => ctx.questions.length * 10,
+      duration: (ctx, event) => ctx.questions.length * 3,
     }),
     nextQuestion: assign({
       selectedQuestion: (ctx) => ctx.selectedQuestion + 1,
