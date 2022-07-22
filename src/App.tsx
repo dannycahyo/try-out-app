@@ -29,11 +29,8 @@ import TimerSection from "./components/TimerSection";
 import StatisticSection from "./components/StatisticSection";
 import { tryOutMachine } from "./machine/tryOutMachine";
 import { useMachine } from "@xstate/react";
-import { getQuestions } from "./api/getQuestions";
-import { useQuery } from "react-query";
 
 function App() {
-  const { data, status } = useQuery("questions", getQuestions);
   const [state, send, service] = useMachine(tryOutMachine);
   const {
     selectedOption,
@@ -43,29 +40,13 @@ function App() {
     duration,
     correctAnswer,
   } = state.context;
-
   const isPassedTheTest = state.matches("passed");
   const isFailedTheTest = state.matches("failed");
-
-  // Init machine transititions
-  React.useEffect(() => {
-    send({ type: "FETCHING" });
-  }, [send]);
-
-  React.useEffect(() => {
-    if (status === "loading") {
-      send({ type: "FETCHING" });
-    } else if (status === "success") {
-      send({ type: "SUCCESS", data });
-    } else if (status === "error") {
-      send({ type: "ERROR" });
-    }
-  }, [data, send, status]);
 
   // Debugguing Purposes
   React.useEffect(() => {
     const subscription = service.subscribe((state) => {
-      console.log(state.context.selectedQuestion);
+      console.log(state);
     });
 
     return subscription.unsubscribe;
@@ -393,7 +374,7 @@ function App() {
 
       <Modal
         isCentered
-        isOpen={state.matches("doingTest.overtime")}
+        isOpen={state.matches({ doingTest: "overtime" })}
         onClose={onClose}
       >
         <ModalOverlay

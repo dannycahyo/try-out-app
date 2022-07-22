@@ -1,4 +1,8 @@
 import { createMachine, assign, Sender } from "xstate";
+import { QueryClient } from "react-query";
+import { getQuestions } from "../api/getQuestions";
+
+const queryClient = new QueryClient();
 
 type question = {
   title: string;
@@ -6,21 +10,79 @@ type question = {
   options: string[];
 };
 
-type Context = {
+interface Context {
   questions: question[];
+  errorMessage: string;
   selectedQuestion: number;
   selectedOption: number;
   correctAnswer: number;
   elapsed: number;
   interval: number;
   duration: number;
+}
+
+type MachineService = {
+  getQuestionsData: {
+    data: question[];
+  };
 };
 
-type TryOutMachineEvents =
+export type MachineStates =
+  | {
+      value: "idle";
+      context: Context;
+    }
+  | {
+      value: "loading";
+      context: Context;
+    }
+  | {
+      value: "questionsError";
+      context: Context;
+    }
+  | {
+      value: "questionsOK";
+      context: Context &
+        Context & {
+          questions: question[];
+          selectedQuestion: number;
+          selectedOption: number;
+          correctAnswer: number;
+          elapsed: number;
+          interval: number;
+          duration: number;
+        };
+    }
+  | {
+      value: "doingTest";
+      context: Context;
+    }
+  | {
+      value: { doingTest: "normal" };
+      context: Context;
+    }
+  | {
+      value: { doingTest: "overtime" };
+      context: Context;
+    }
+  | {
+      value: "evaluation";
+      context: Context;
+    }
+  | {
+      value: "passed";
+      context: Context;
+    }
+  | {
+      value: "failed";
+      context: Context;
+    };
+
+type MachineEvents =
   | { type: "FETCHING" }
-  | { type: "SUCCESS"; data: question[] }
+  | { type: "FETCHING_SUCCESS"; data: question[] }
+  | { type: "FETCHING_ERROR"; error: string }
   | { type: "REFETCH" }
-  | { type: "ERROR" }
   | { type: "STARTTEST" }
   | {
       type: "CHOOSEQUESTION";
@@ -37,7 +99,20 @@ type TryOutMachineEvents =
   | { type: "SUBMITANSWER" }
   | { type: "RESET" };
 
-const setTimer = (ctx: Context) => (send: Sender<TryOutMachineEvents>) => {
+type MachineActions =
+  | { type: "assignQuestionsData" }
+  | { type: "setDuration" }
+  | { type: "chooseQuestion" }
+  | { type: "chooseAnswer" }
+  | { type: "chooseOption" }
+  | { type: "procedToSubmit" }
+  | { type: "nextQuestion" }
+  | { type: "chooseAnswer" }
+  | { type: "prevQuestion" }
+  | { type: "startTimer" }
+  | { type: "restartTheTest" };
+
+const setTimer = (ctx: Context) => (send: Sender<MachineEvents>) => {
   const interval = setInterval(() => {
     send("TICK");
   }, ctx.interval * 1000);
@@ -45,11 +120,17 @@ const setTimer = (ctx: Context) => (send: Sender<TryOutMachineEvents>) => {
   return () => clearInterval(interval);
 };
 
-export const tryOutMachine = createMachine({
-  tsTypes: {} as import("./tryOutMachine.typegen").Typegen0,
+export const tryOutMachine = createMachine<
+  Context,
+  MachineEvents,
+  MachineStates,
+  MachineService
+>({
   schema: {
     context: {} as Context,
-    events: {} as TryOutMachineEvents,
+    events: {} as MachineEvents,
+    actions: {} as MachineActions,
+    services: {} as MachineService,
   },
   id: "TryOut App",
   initial: "idle",
@@ -61,6 +142,7 @@ export const tryOutMachine = createMachine({
         title: "",
       },
     ],
+    errorMessage: "",
     selectedQuestion: 0,
     selectedOption: 0,
     correctAnswer: 0,
@@ -70,17 +152,26 @@ export const tryOutMachine = createMachine({
   },
   states: {
     idle: {
+      invoke: {
+        src: "initMachineTransition",
+      },
       on: {
         FETCHING: "loading",
       },
     },
     loading: {
+      invoke: {
+        src: "getQuestionsData",
+      },
       on: {
-        SUCCESS: {
-          actions: "assignQuestionsData",
+        FETCHING_SUCCESS: {
           target: "questionsOK",
+          actions: "assignQuestionsData",
         },
-        ERROR: "questionError",
+        FETCHING_ERROR: {
+          target: "questionError",
+          actions: "assignErrorMessage",
+        },
       },
     },
     questionError: {
@@ -176,9 +267,25 @@ export const tryOutMachine = createMachine({
     },
   },
 }).withConfig({
+  services: {
+    initMachineTransition: () => (send) => {
+      send({ type: "FETCHING" });
+    },
+    getQuestionsData: () => (send) => {
+      queryClient
+        .fetchQuery("questions", getQuestions)
+        .then((value) => send({ type: "FETCHING_SUCCESS", data: value }))
+        .catch((error) => send({ type: "FETCHING_ERROR", error: error }));
+    },
+  },
   actions: {
     assignQuestionsData: assign({
-      questions: (ctx, event) => event.data,
+      questions: (ctx, event) =>
+        event.type === "FETCHING_SUCCESS" ? event.data : ctx.questions,
+    }),
+    assignErrorMessage: assign({
+      errorMessage: (ctx, event) =>
+        event.type === "FETCHING_ERROR" ? event.error : ctx.errorMessage,
     }),
     startTimer: assign({
       elapsed: (ctx) => ctx.elapsed + ctx.interval,
@@ -193,18 +300,22 @@ export const tryOutMachine = createMachine({
       selectedQuestion: (ctx) => ctx.selectedQuestion - 1,
     }),
     chooseQuestion: assign({
-      selectedQuestion: (ctx, event) => event.index,
+      selectedQuestion: (ctx, event) =>
+        event.type === "CHOOSEQUESTION" ? event.index : ctx.selectedQuestion,
     }),
     procedToSubmit: assign({
       selectedQuestion: (ctx) => 10,
     }),
     chooseOption: assign({
-      selectedOption: (ctx, event) => event.index,
+      selectedOption: (ctx, event) =>
+        event.type === "CHOOSEOPTION" ? event.index : ctx.selectedOption,
     }),
     chooseAnswer: assign({
       correctAnswer: (ctx, event) =>
-        event.rightOption === event.finalAnswer
-          ? ctx.correctAnswer + 1
+        event.type === "CHOOSEQUESTION"
+          ? event.rightOption === event.finalAnswer
+            ? ctx.correctAnswer + 1
+            : ctx.correctAnswer
           : ctx.correctAnswer,
     }),
     restartTheTest: assign({
