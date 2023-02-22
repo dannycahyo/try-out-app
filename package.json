@@ -32,7 +32,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "postinstall": "xstate typegen \"./src/**/*.ts?(x)\"",
-    "mock-server": "json-server --watch db.json"
+    "mock-server": "json-server --watch db.json --port 3001"
   },
   "eslintConfig": {
     "extends": [

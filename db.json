@@ -12,102 +12,102 @@
             ]
         },
         {
-            "title": "Deremmah Odik?",
-            "rightOption": "B Aja",
+            "title": "What's your favorite color?",
+            "rightOption": "Blue",
             "options": [
-                "B Aja",
-                "Super Duper",
-                "OK Fine",
-                "All Good",
-                "So Excited"
+                "Red",
+                "Green",
+                "Blue",
+                "Yellow",
+                "Orange"
             ]
         },
         {
-            "title": "Gimana kabar?",
-            "rightOption": "So Excited",
+            "title": "Which is the tallest mammal?",
+            "rightOption": "Giraffe",
             "options": [
-                "OK Fine",
-                "B Aja",
-                "So Excited",
-                "Super Duper",
-                "All Good"
+                "Elephant",
+                "Giraffe",
+                "Horse",
+                "Zebra",
+                "Gorilla"
             ]
         },
         {
-            "title": "Piye Kabare Cak?",
-            "rightOption": "OK Fine",
+            "title": "What's the largest planet in our solar system?",
+            "rightOption": "Jupiter",
             "options": [
-                "B Aja",
-                "Super Duper",
-                "OK Fine",
-                "So Excited",
-                "All Good"
+                "Venus",
+                "Mars",
+                "Jupiter",
+                "Saturn",
+                "Neptune"
             ]
         },
         {
-            "title": "Gimana pas udah kelar ngengek?",
-            "rightOption": "All Good",
+            "title": "What's the fastest land animal?",
+            "rightOption": "Cheetah",
             "options": [
-                "OK Fine",
-                "B Aja",
-                "So Excited",
-                "Super Duper",
-                "All Good"
+                "Lion",
+                "Tiger",
+                "Jaguar",
+                "Cheetah",
+                "Leopard"
             ]
         },
         {
-            "title": "Koo gitu sih? Wdyt?",
-            "rightOption": "So Excited",
+            "title": "What's the capital of Australia?",
+            "rightOption": "Canberra",
             "options": [
-                "OK Fine",
-                "B Aja",
-                "So Excited",
-                "Super Duper",
-                "All Good"
+                "Melbourne",
+                "Sydney",
+                "Canberra",
+                "Brisbane",
+                "Adelaide"
             ]
         },
         {
-            "title": "Buntu aku cok, gimana ya?",
-            "rightOption": "OK Fine",
+            "title": "What's the largest ocean?",
+            "rightOption": "Pacific",
             "options": [
-                "B Aja",
-                "All Good",
-                "OK Fine",
-                "So Excited",
-                "Super Duper"
+                "Atlantic",
+                "Indian",
+                "Arctic",
+                "Southern",
+                "Pacific"
             ]
         },
         {
-            "title": "Hadeehh, capek cok. Kamu?",
-            "rightOption": "B Aja",
+            "title": "What's the hottest planet in our solar system?",
+            "rightOption": "Venus",
             "options": [
-                "All Good",
-                "OK Fine",
-                "Super Duper",
-                "B Aja",
-                "So Excited"
+                "Mercury",
+                "Venus",
+                "Mars",
+                "Jupiter",
+                "Saturn"
             ]
         },
         {
-            "title": "Sini cerita, gimana2?",
-            "rightOption": "OK Fine",
+            "title": "Which is the only continent that is also a country?",
+            "rightOption": "Australia",
             "options": [
-                "Super Duper",
-                "OK Fine",
-                "B Aja",
-                "So Excited",
-                "All Good"
+                "North America",
+                "South America",
+                "Europe",
+                "Australia",
+                "Africa"
             ]
         },
         {
-            "title": "Jangan lupa makan ya, OK?",
-            "rightOption": "Super Duper",
+            "title": "What's the name of the first man to walk on the moon?",
+            "rightOption": "Neil Armstrong",
             "options": [
-                "B Aja",
-                "OK Fine",
-                "All Good",
-                "So Excited",
-                "Super Duper"
+                "Buzz Aldrin",
+                "Michael Collins",
+                "John Glenn",
+                "Yuri Gagarin",
+                "Neil Armstrong"
             ]
         }
     ]

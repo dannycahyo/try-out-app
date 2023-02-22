@@ -33,12 +33,12 @@ import { useMachine } from "@xstate/react";
 function App() {
   const [state, send, service] = useMachine(tryOutMachine);
   const {
-    selectedOption,
     questions,
     selectedQuestion,
     elapsed,
     duration,
     correctAnswer,
+    userAnswers,
   } = state.context;
   const isPassedTheTest = state.matches("passed");
   const isFailedTheTest = state.matches("failed");
@@ -52,18 +52,12 @@ function App() {
     return subscription.unsubscribe;
   }, [service]);
 
-  const [question, options, rightOption, finalAnswer]: [
-    string,
-    string[],
-    string,
-    string
-  ] = [
+  const [question, options]: [string, string[]] = [
     questions[selectedQuestion]?.title,
     questions[selectedQuestion]?.options,
-    questions[selectedQuestion]?.rightOption,
-    questions[selectedQuestion]?.options[selectedOption],
   ];
 
+  // TODO: Change this state into machine state
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const modalTitle = isPassedTheTest
@@ -77,6 +71,14 @@ function App() {
     : isFailedTheTest
     ? "That's totally okay, Let's try again!"
     : "";
+
+  const isAnsweredProps = {
+    transform: "scale(0.98)",
+    borderColor: "#bec3c9",
+    border: "10px",
+    bgGradient: "linear(to-r, red.500, yellow.500)",
+    color: "white",
+  };
 
   return (
     <Layout>
@@ -129,7 +131,7 @@ function App() {
                       _hover={{
                         bgGradient: "linear(to-r, red.500, yellow.500)",
                       }}
-                      onClick={() => send({ type: "STARTTEST" })}
+                      onClick={() => send({ type: "START_TEST" })}
                     >
                       Start
                     </Box>
@@ -155,23 +157,19 @@ function App() {
                   <Stack direction="column">
                     <Wrap spacing={4}>
                       {questions.map((question, index) => (
-                        <WrapItem>
+                        <WrapItem key={question.title}>
                           <Button
                             color="red.400"
                             variant="outline"
-                            _focusWithin={{
-                              transform: "scale(0.98)",
-                              borderColor: "#bec3c9",
-                              border: "10px",
-                              bgGradient: "linear(to-r, red.500, yellow.500)",
-                              color: "white",
+                            _hover={{
+                              bgGradient: "linear(to-r, blue.500, cyan.500)",
                             }}
+                            {...(question.title ===
+                              userAnswers[index]?.question && isAnsweredProps)}
                             onClick={() =>
                               send({
-                                type: "CHOOSEQUESTION",
-                                index,
-                                rightOption,
-                                finalAnswer,
+                                type: "CHOOSE_QUESTION",
+                                questionNumber: index,
                               })
                             }
                           >
@@ -201,7 +199,7 @@ function App() {
                         _hover={{
                           bgGradient: "linear(to-r, red.500, yellow.500)",
                         }}
-                        onClick={() => send({ type: "PREVQUESTION" })}
+                        onClick={() => send({ type: "PREV_QUESTION" })}
                       >
                         <Heading size="md">Prev</Heading>
                       </Box>
@@ -223,9 +221,7 @@ function App() {
                         }}
                         onClick={() =>
                           send({
-                            type: "NEXTQUESTION",
-                            rightOption,
-                            finalAnswer,
+                            type: "NEXT_QUESTION",
                           })
                         }
                       >
@@ -249,10 +245,10 @@ function App() {
                     bgGradient: "linear(to-r, red.500, yellow.500)",
                   }}
                   onClick={() => {
-                    send({ type: "PROCEDTOSUBMIT" });
+                    send({ type: "PROCEED_TO_SUBMIT" });
                   }}
                 >
-                  <Heading size="md">Proceed To Submit</Heading>
+                  <Heading size="md">Submit</Heading>
                 </Box>
               </Center>
             </>
@@ -260,6 +256,7 @@ function App() {
         </Box>
 
         <Box py="12">
+          {/* TODO: Change this condition */}
           {selectedQuestion === questions.length ? (
             <Center>
               <Alert
@@ -294,7 +291,7 @@ function App() {
                     bgGradient: "linear(to-r, red.500, yellow.500)",
                   }}
                   onClick={() => {
-                    send({ type: "SUBMITANSWER" });
+                    send({ type: "SUBMIT_ANSWER" });
                     onOpen();
                   }}
                 >
@@ -305,26 +302,37 @@ function App() {
           ) : (
             <>
               <QuestionSection question={question} />
-              <OptionsSection options={options} state={state} send={send} />
+              <OptionsSection
+                selectedQuestion={selectedQuestion}
+                userAnswers={userAnswers}
+                options={options}
+                question={question}
+                isDoingTestState={!state.matches("doingTest")}
+                send={send}
+              />
             </>
           )}
         </Box>
       </SimpleGrid>
 
-      <Modal isCentered isOpen={isOpen} onClose={onClose} size="xl">
-        {isPassedTheTest} && (
+      <Modal
+        isCentered
+        isOpen={isOpen || isFailedTheTest || isPassedTheTest}
+        onClose={onClose}
+        size="xl"
+      >
+        {isPassedTheTest} &&
         <ModalOverlay
           bg="none"
           backdropFilter="auto"
           backdropInvert="80%"
           backdropBlur="2px"
         />
-        ){isFailedTheTest} && (
+        {isFailedTheTest} &&
         <ModalOverlay
           bg="blackAlpha.300"
           backdropFilter="blur(10px) hue-rotate(90deg)"
         />
-        )
         <ModalContent>
           <ModalHeader>{modalTitle}</ModalHeader>
           <ModalBody>
@@ -389,7 +397,7 @@ function App() {
           <ModalFooter>
             <Button
               onClick={() => {
-                send({ type: "SEERESULT" });
+                send({ type: "SEE_RESULT" });
                 onOpen();
               }}
             >
