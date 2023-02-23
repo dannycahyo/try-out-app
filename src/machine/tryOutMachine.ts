@@ -1,120 +1,14 @@
-import { createMachine, assign, Sender } from "xstate";
+import { createMachine, assign } from "xstate";
 import { QueryClient } from "react-query";
+
+import { Context, MachineEvents, MachineService, MachineStates } from "./type";
 import { getQuestions } from "../api/getQuestions";
+import { setTimer } from "./utils";
 
 const queryClient = new QueryClient();
 
-type question = {
-  title: string;
-  rightOption: string;
-  options: string[];
-};
-
-type UserAnswer = {
-  question: string;
-  answer: string;
-};
-
-type Context = {
-  questions: question[];
-  userAnswers: UserAnswer[];
-  questionsErrorMessage?: string;
-  selectedQuestion: number;
-  correctAnswer: number;
-  elapsed: number;
-  interval: number;
-  duration: number;
-};
-
-type MachineService = {
-  getQuestionsData: {
-    data: question[];
-  };
-};
-
-export type MachineStates =
-  | {
-      value: "idle";
-      context: Context;
-    }
-  | {
-      value: "loading";
-      context: Context;
-    }
-  | {
-      value: "questionsError";
-      context: Context;
-    }
-  | {
-      value: "questionsOK";
-      context: Context & {
-        questions: question[];
-        selectedQuestion: number;
-        selectedOption: number;
-        correctAnswer: number;
-        elapsed: number;
-        interval: number;
-        duration: number;
-      };
-    }
-  | {
-      value: "doingTest";
-      context: Context;
-    }
-  | {
-      value: { doingTest: "normal" };
-      context: Context;
-    }
-  | {
-      value: { doingTest: "overtime" };
-      context: Context;
-    }
-  | {
-      value: "evaluation";
-      context: Context;
-    }
-  | {
-      value: "passed";
-      context: Context;
-    }
-  | {
-      value: "failed";
-      context: Context;
-    };
-
-type MachineEvents =
-  | { type: "FETCHING" }
-  | { type: "FETCHING_SUCCESS"; data: question[] }
-  | { type: "FETCHING_ERROR"; error: string }
-  | { type: "REFETCH_QUESTIONS" }
-  | { type: "START_TEST" }
-  | {
-      type: "CHOOSE_QUESTION";
-      questionNumber: number;
-    }
-  | {
-      type: "CHOOSE_ANSWER";
-      question: string;
-      answer: string;
-    }
-  | { type: "PROCEED_TO_SUBMIT" }
-  | { type: "NEXT_QUESTION" }
-  | { type: "PREV_QUESTION" }
-  | { type: "SEE_RESULT" }
-  | { type: "TICK" }
-  | { type: "SUBMIT_ANSWER" }
-  | { type: "RESET" };
-
-const setTimer = (ctx: Context) => (send: Sender<MachineEvents>) => {
-  const interval = setInterval(() => {
-    send("TICK");
-  }, ctx.interval * 1000);
-
-  return () => clearInterval(interval);
-};
-
 export const tryOutMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBUBOBPA8gVwC4AIBBAB2IDoBLCAGzAGIAxAUWQGEAJASQDkBxAbQAMAXUShiAe1gVcFCQDsxIAB6IAjGoBMAdjIAOAKwBOAMzaALObV7NJkwBoQ6ROaNqyBgGzbtez5oNXI01NTwBfMMc0LDwiUjJqCQBDCAp5KDoIBTBKeQA3CQBrHOicAhJyRJS0qAQ0goBjJNkFIWE2pUlpFsUkFXUDNXMyc08-YLcjMfM9R2cEEyM9Mk8h41cZzXMDEwiojDK4yuTU9LowVFQJVDJiamaAM2uAWzJS2IqEk5q6-IkmnptDp9LoyOS9UCqBBqQbDUbjTSTaazJyIQKaMiCbw+Ax6KYmPF7EDvcrxACO2DgPSYl2udAASkxmGx2AB9ACKAFUmABlZCcTDcHnA8RSMEKJRQmFDEZjTwTNRTPQzOYuNwebGKkxjNTeNREklHMgUqng2CYADSdD5hHpyFZyF5yBFIFBPUlaM0qoQencBkEAcEJkEuO0ahM5l2kWJBw+8SyNWQVLo-NYFpdbvBHoQOkEKxMmj0glG5gCgm0nk83pCJjIRgrXmCgj0i1CegNsdJ5AT6STsFw1s5ACEALKce2EIUAdSY9IzYvdfShnhMBjIakEpgrrkEIQM2m9LeGnlDfjD20VHZiXbIPagfdwZHkLyS1DoHEwmB5TA53L5Au4eduizJd1HLb1sTIQsjCDAsKyMSNzCvQ5PjvB8nxfN8Py-H9Jx5Gc5xEToFxAyF1C0OsGzDYJK20LxvVxdw7GMAN6zowxkLjbsJETKkMNQZ5XzoAAFelMFYJgmAAEQdTBWR5Ycx2dIiQRIiVQIQFc1w3LdPB3PcD1RBBfGGGE9G0YNrH8et9WjQ1UJ43s+OfAShO4JgAA17S5J0AKA8UIX6aFFTIRYsTUMMC2CAxEW9GY1wJHQ5V8EIVyQuzOyNNDnMwkTGQANV-XzBX8xcyOhTQ8x0xKjAMQJ-ACb0CSMEZERXFdfDPHxOJvbL+34wS31K0igpMGVNzMHYdVXPwIO8ddQwsMNDD0Vaeqyxz7z4iQ8guWRnnob8f0ZBSABllNEVTgPU8q9O0ibtxggzqy2SiT3lSqWxo9sMuvI0wDyV9sGacE6GGm6gqMKH9AsetKuDUti2rMaVmVcyrEsbwrHWz4AaBkGFDBtRLtFa7AqhKGWvRuGg2LSrzCanR8yLCy7GbfdtBx+JiCSWBYEgBleRYcHyfUQtPCgk9BnCzc9IZozKol7RmzZiNasLTQufIB4kgoWgIEF78LuIsnsy0Lx9BgsYln3PStia3cVlWUZQhmVbvAMCJo2fCA4CUezSBNgLs3l+YAFpwl+lD4ioWgg7KoK-DXPU-ACBCntDlwxg1Hxd1sMNEVs-Y-s+KpTigeORqlUJdCxLYLHlEMzAcIz4Rz5WawLtwteNSl+3BGkrlQSuIalCw8yt83cVXTcDAYgMFo3fwtELZXKx7k1+4Uc0LRH0XoQs4ZlTMYsrB1MZvQ0Fqkrq7QnosFse763A9+zYwHfcCZKyLPS7DPJ-NroRcoNV+GkzIjDMK4QwzV2Yt3mD4ZYWxKpLGtuYCsnMo5cVvIA7au1UD7TAKA8qaD3DvTLPKX0ixM6aRPCMZsFZVqbkEBoTWmCbx42oMDBOmZR6IHMnmFO-h1gZ2RhLVcMJKyrHRlZHuPM+aQCIUFDQd8Rg7A3EGLQ1gvQK0RHWNWzDvCGE3EXGMJd4g6z1goq6wcwG6gxMtX0phww4moQWNcq0ix2DYmeSOEQgA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBUBOBPA8gVwC4AIBBAB2IDoBLCAGzAGIAxAUWQGEAJASQDkBxAbQAMAXUShiAe1gVcFCQDsxIAB6IAzIIAsZAIwAOAOyaAnIL2G9AVisAaEOkR6ATDrIH9B4wDYdvgwa81AF8guzQsPCJSMmoJAEMICnkoOggFMEp5ADcJAGsM8JwCEnJYhKSoBCScgGM42QUhYSalSWkGxSQVRC9zN29zcxcdL0s7BwQvAz0yLy9NMz1jHScnLS8QsIwiqNL4xOS6MFRUCVQyYmp6gDMzgFsyQsiSmP2KquyJOo6mlq62mRyTqgVSTYwzTy9QbDUbjRyrXQ6AxONSmJxeZYrTYgJ7FaIAR2wcA6TBOZzoACUmMw2OwAPoARQAqkwAMrITiYbisv7iKSAhRKUEYiEDaG+WH2RD+Vw+ZFqSyaKxOEyWbG43ZkQnEoGwTAAaTo7MIFOQdOQbOQvJAAI6QsQllMukExksaj83ic7jhCC9rmMTmM7kElh0ljMAbVoRx22e0TSFWQxKNTCYdKprKZABkrSJWvy7V1QY7BM7Xe6kZ7vVKEJYvWRLF4nJZHTpBPolQZ1bG8eQE8kk7BcGR5Pc4tQ6BzWPrrbagfaEG2DLMVd5G4IAgYN8YfV4zGR0Y3NGpNFMK5puxFe2R+1BB8PR6g7uO6BxMJhWWnmZbOdxZwX5yLaUnB9UMnDId1m1PPRNGPHRT0vHYXlve8RzHCc3w-NNCG5AB1JgKX-dpAJBaVlyDUZYOMai9Hg3ofTUJYyFMJtrGPSx-CgxC4z7CRE2JNCnxfbgmAADTNb92V-IiBWBboEBgiCWMWIxAjUAwfUDNRmLdHQ1DmaiAhMLtow1ZC+IHATH2fCcAAUqQANUZFkpK5GTC1IhTLDLE81BVMDBB8H0dHBMhBHC9sTECAwOM0JxuOvFCrPQuh3JI+SvWMMLjHUxjXXMY8dxrYNmN6TwQxRd1BHi0ye01VA4GwahcEpNkWDSwUgMXVZS0g0ZPBi8xjE0UCtDIPQFQGHwTxWGqtiverGuasgwCycdsHqIFUrzf4AM6zzTG0gM1l8vS60C0C1gglZQy3HLO2MBLFtgJrh1W9bNoUVKdFEXbiP2+TDuYnrToVNYvFA6Zxpu8GFXgoMQmjUcIDgJQzNIfN-rk0EAFoVR9PHtAi4mScip6XioWhMdkhc4p9Aa3A8HKrE8ZYNlqhaXjKA4oGpjz5Ng1xUUChY1AVJtDHpoNGcMZmOOokZyYJIkhyBUlTlQPn0tBSMDxPOKfD0eZBD8n0JpmdF1gWJtOyV8htVVhQ9X1LWAdBPSrDcWiFnOlwlTUUCNAbVixfBcx1MejmkPjCy72JV3scQfGa0CBsIpCxsNFWQwo3m6PeP4odBJshOFxWbTjyMAwxZ9k8W3pl0DyZk2Rj86i7ZvWPUIkLJjlkO4wFLrrjy8WZGycZxFVPAM5gbrKXFllvAkDSO854sgGpe5qh885FR-cJY2yg6uTB9OCwtY1YR9Vdm1+vTfXpWtbqA2-m5zdsjtAP5ZqsVE+iomHWbQQZlgwXgnXLEUd14P2WsQOIsBYCQB3vJNsE006RRotRaqIEayhhmOPRUIVqJ4NzjGTm0QYHDmuHECgtAIDIPdmYbS4YMHgiwasSGy5Aqrl0qGawUYQhAA */
   createMachine<Context, MachineEvents, MachineStates, MachineService>({
     schema: {
       context: {} as Context,
@@ -186,14 +80,14 @@ export const tryOutMachine =
               cond: "timerExpired",
             },
             on: {
+              TICK: {
+                actions: "startTimer",
+              },
               CHOOSE_QUESTION: {
                 actions: "chooseQuestion",
               },
               CHOOSE_ANSWER: {
                 actions: ["chooseAnswer", "evaluateTheTest"],
-              },
-              PROCEED_TO_SUBMIT: {
-                target: "#evaluation",
               },
               NEXT_QUESTION: {
                 actions: "nextQuestion",
@@ -203,46 +97,34 @@ export const tryOutMachine =
               },
             },
           },
-          overtime: {
-            on: {
-              SEE_RESULT: {
-                target: "#evaluation",
+          overtime: {},
+        },
+        on: {
+          SEE_RESULT: {
+            target: "#result",
+          },
+        },
+      },
+      result: {
+        id: "result",
+        initial: "evaluation",
+        states: {
+          evaluation: {
+            always: [
+              {
+                cond: "passTheKKM",
+                target: "passed",
               },
-            },
+              {
+                target: "failed",
+              },
+            ],
           },
+          passed: {},
+          failed: {},
         },
         on: {
-          TICK: {
-            actions: "startTimer",
-          },
-          SUBMIT_ANSWER: {
-            target: "evaluation",
-          },
-        },
-      },
-      evaluation: {
-        id: "evaluation",
-        always: [
-          {
-            cond: "passTheKKM",
-            target: "passed",
-          },
-          {
-            target: "failed",
-          },
-        ],
-      },
-      passed: {
-        on: {
-          RESET: {
-            actions: "restartTheTest",
-            target: "questionsOK",
-          },
-        },
-      },
-      failed: {
-        on: {
-          RESET: {
+          RESTART_TEST: {
             actions: "restartTheTest",
             target: "questionsOK",
           },
@@ -305,7 +187,7 @@ export const tryOutMachine =
         correctAnswer: (_) => 0,
         elapsed: (_) => 0,
         interval: (_) => 0.1,
-        duration: (ctx) => 0,
+        duration: (_) => 0,
       }),
     },
     guards: {
@@ -313,5 +195,3 @@ export const tryOutMachine =
       timerExpired: (ctx) => ctx.elapsed >= ctx.duration,
     },
   });
-
-export type { MachineEvents, UserAnswer };

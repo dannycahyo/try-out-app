@@ -1,5 +1,5 @@
 import { Box, Button, Center, Text } from "@chakra-ui/react";
-import type { MachineEvents, UserAnswer } from "../machine/tryOutMachine";
+import type { MachineEvents, UserAnswer } from "../machine/type";
 
 type OptionsSectionProps = {
   selectedQuestion: number;
