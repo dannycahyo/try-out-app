@@ -72,61 +72,81 @@ function App() {
               />
             )
           )
-          .with({ value: "questionsOK" }, ({ context: { elapsed } }) => (
-            <Box py="12">
-              <Text
-                bgGradient="linear(to-l, #90CDF4, #0BC5EA)"
-                bgClip="text"
-                fontSize="4xl"
-                fontWeight="extrabold"
-                textAlign="center"
-              >
-                Let's Get Started
-              </Text>
-
-              <Center mt="4">
-                <Flex>
-                  <Box
-                    borderWidth="2px"
-                    borderRadius="lg"
-                    overflow="hidden"
-                    p="4"
-                    width="40"
-                    mr="8"
+          .with(
+            { value: "questionsOK" },
+            ({
+              context: { elapsed, questions, selectedQuestion, userAnswers },
+            }) => (
+              <>
+                <Box py="12">
+                  <Text
+                    bgGradient="linear(to-l, #90CDF4, #0BC5EA)"
+                    bgClip="text"
+                    fontSize="4xl"
+                    fontWeight="extrabold"
+                    textAlign="center"
                   >
-                    <Text
-                      color="red.400"
-                      fontSize="2xl"
-                      fontWeight="extrabold"
-                      textAlign="center"
-                    >
-                      Ready?
-                    </Text>
-                    <Center>
-                      <Box
-                        as="button"
-                        p={4}
-                        w="24"
-                        mt="6"
-                        color="white"
-                        fontWeight="bold"
-                        borderRadius="md"
-                        bgGradient="linear(to-r, blue.500, cyan.500)"
-                        _hover={{
-                          bgGradient: "linear(to-r, red.500, yellow.500)",
-                        }}
-                        onClick={() => send({ type: "START_TEST" })}
-                      >
-                        Start
-                      </Box>
-                    </Center>
-                  </Box>
+                    Let's Get Started
+                  </Text>
 
-                  <TimerSection elapsed={elapsed} />
-                </Flex>
-              </Center>
-            </Box>
-          ))
+                  <Center mt="4">
+                    <Flex>
+                      <Box
+                        borderWidth="2px"
+                        borderRadius="lg"
+                        overflow="hidden"
+                        p="4"
+                        width="40"
+                        mr="8"
+                      >
+                        <Text
+                          color="red.400"
+                          fontSize="2xl"
+                          fontWeight="extrabold"
+                          textAlign="center"
+                        >
+                          Ready?
+                        </Text>
+                        <Center>
+                          <Box
+                            as="button"
+                            p={4}
+                            w="24"
+                            mt="6"
+                            color="white"
+                            fontWeight="bold"
+                            borderRadius="md"
+                            bgGradient="linear(to-r, blue.500, cyan.500)"
+                            _hover={{
+                              bgGradient: "linear(to-r, red.500, yellow.500)",
+                            }}
+                            onClick={() => send({ type: "START_TEST" })}
+                          >
+                            Start
+                          </Box>
+                        </Center>
+                      </Box>
+
+                      <TimerSection elapsed={elapsed} />
+                    </Flex>
+                  </Center>
+                </Box>
+                <Box py="12">
+                  <QuestionSection
+                    question={questions[selectedQuestion].title}
+                  />
+                  <OptionsSection
+                    selectedQuestion={selectedQuestion}
+                    userAnswers={userAnswers}
+                    options={questions[selectedQuestion].options}
+                    question={questions[selectedQuestion].title}
+                    isDoingTestState={false}
+                    send={send}
+                  />
+                </Box>
+              </>
+            )
+          )
           .with({ value: "doingTest" }, () => <LoadingSkeleton />)
           .with(
             { value: { doingTest: "normal" } },
@@ -135,6 +155,16 @@ function App() {
             }) => (
               <>
                 <Box py="12">
+                  <Text
+                    bgGradient="linear(to-l, #90CDF4, #0BC5EA)"
+                    bgClip="text"
+                    fontSize="4xl"
+                    fontWeight="extrabold"
+                    textAlign="center"
+                    mb="4"
+                  >
+                    You Can Do It!
+                  </Text>
                   <Center>
                     <TimerSection elapsed={elapsed} />
                   </Center>
@@ -256,7 +286,7 @@ function App() {
                     userAnswers={userAnswers}
                     options={questions[selectedQuestion].options}
                     question={questions[selectedQuestion].title}
-                    isDoingTestState={!state.matches("doingTest")}
+                    isDoingTestState={true}
                     send={send}
                   />
                 </Box>
@@ -338,10 +368,8 @@ function App() {
             ({ context: { correctAnswer, duration, elapsed } }) => (
               <Modal isCentered isOpen={true} onClose={() => {}} size="xl">
                 <ModalOverlay
-                  bg="none"
-                  backdropFilter="auto"
-                  backdropInvert="80%"
-                  backdropBlur="2px"
+                  bg="blackAlpha.300"
+                  backdropFilter="blur(10px) hue-rotate(90deg)"
                 />
                 <ModalContent>
                   <ModalHeader>Upss Sorry, You Failed!</ModalHeader>

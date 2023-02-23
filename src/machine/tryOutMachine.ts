@@ -188,6 +188,7 @@ export const tryOutMachine =
         elapsed: (_) => 0,
         interval: (_) => 0.1,
         duration: (_) => 0,
+        userAnswers: (ctx) => new Array(ctx.questions.length).fill({}),
       }),
     },
     guards: {

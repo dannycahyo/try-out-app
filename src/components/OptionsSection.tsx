@@ -44,7 +44,7 @@ const OptionsSection = ({
               py="10"
               {...(option === userAnswers[selectedQuestion]?.answer &&
                 isAnsweredProps)}
-              disabled={isDoingTestState}
+              disabled={!isDoingTestState}
               onClick={() => {
                 send({ type: "CHOOSE_ANSWER", answer: option, question });
               }}
