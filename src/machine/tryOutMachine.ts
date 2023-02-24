@@ -2,7 +2,7 @@ import { createMachine, assign } from "xstate";
 import { QueryClient } from "react-query";
 
 import { Context, MachineEvents, MachineService, MachineStates } from "./type";
-import { getQuestions } from "../api/getQuestions";
+import { getQuestions } from "../fetcher/getQuestions";
 import { setTimer } from "./utils";
 
 const queryClient = new QueryClient();
