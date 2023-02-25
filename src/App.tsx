@@ -151,19 +151,25 @@ function App() {
           .with(
             { value: { doingTest: "normal" } },
             ({
-              context: { questions, userAnswers, selectedQuestion, elapsed },
+              context: {
+                questions,
+                userAnswers,
+                selectedQuestion,
+                elapsed,
+                duration,
+              },
             }) => (
               <>
                 <Box py="12">
                   <Text
                     bgGradient="linear(to-l, #90CDF4, #0BC5EA)"
                     bgClip="text"
-                    fontSize="4xl"
+                    fontSize="2xl"
                     fontWeight="extrabold"
                     textAlign="center"
                     mb="4"
                   >
-                    You Can Do It!
+                    {`Duration of the test is ${duration / 60} minutes `}
                   </Text>
                   <Center>
                     <TimerSection elapsed={elapsed} />
@@ -386,8 +392,8 @@ function App() {
                       Summary
                     </Text>
                     <StatisticSection
-                      isFailedTheTest={false}
-                      isPassedTheTest={true}
+                      isFailedTheTest={true}
+                      isPassedTheTest={false}
                       correctAnswer={correctAnswer}
                       duration={duration}
                       elapsed={elapsed}
