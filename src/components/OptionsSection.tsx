@@ -1,15 +1,30 @@
-import React from "react";
 import { Box, Button, Center, Text } from "@chakra-ui/react";
+import type { MachineEvents, UserAnswer } from "../machine/type";
+
+type OptionsSectionProps = {
+  selectedQuestion: number;
+  options: string[];
+  question: string;
+  userAnswers: UserAnswer[];
+  isDoingTestState: boolean;
+  send: (event: MachineEvents) => void;
+};
 
 const OptionsSection = ({
+  selectedQuestion,
   options,
+  question,
+  userAnswers,
+  isDoingTestState,
   send,
-  state,
-}: {
-  options: string[];
-  state: any;
-  send: any;
-}) => {
+}: OptionsSectionProps) => {
+  const isAnsweredProps = {
+    transform: "scale(0.98)",
+    borderColor: "#bec3c9",
+    border: "10px",
+    bgGradient: "linear(to-r, red.500, yellow.500)",
+  };
+
   return (
     <Box py="2">
       <Center>
@@ -22,20 +37,16 @@ const OptionsSection = ({
           display="flex"
           flexDir="column"
         >
-          {options.map((option, index) => (
+          {options.map((option) => (
             <Button
               key={option}
               mt="4"
               py="10"
-              _focusWithin={{
-                transform: "scale(0.98)",
-                borderColor: "#bec3c9",
-                border: "10px",
-                bgGradient: "linear(to-r, red.500, yellow.500)",
-              }}
-              disabled={!state.matches("doingTest")}
+              {...(option === userAnswers[selectedQuestion]?.answer &&
+                isAnsweredProps)}
+              disabled={!isDoingTestState}
               onClick={() => {
-                send({ type: "CHOOSEOPTION", index });
+                send({ type: "CHOOSE_ANSWER", answer: option, question });
               }}
             >
               <Text
