@@ -1,5 +1,5 @@
 export const getQuestions = async () => {
-  const result = await fetch("http://localhost:3001/questions");
+  const result = await fetch("https://try-out-app-api.vercel.app/questions");
   const data = await result.json();
   return data;
 };
