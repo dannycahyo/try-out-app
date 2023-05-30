@@ -75,7 +75,13 @@ function App() {
           .with(
             { value: "questionsOK" },
             ({
-              context: { elapsed, questions, selectedQuestion, userAnswers },
+              context: {
+                elapsed,
+                questions,
+                selectedQuestion,
+                userAnswers,
+                duration,
+              },
             }) => (
               <>
                 <Box py="12">
@@ -127,7 +133,7 @@ function App() {
                         </Center>
                       </Box>
 
-                      <TimerSection elapsed={elapsed} />
+                      <TimerSection elapsed={elapsed} duration={duration} />
                     </Flex>
                   </Center>
                 </Box>
@@ -172,7 +178,7 @@ function App() {
                     {`Duration of the test is ${duration / 60} minutes `}
                   </Text>
                   <Center>
-                    <TimerSection elapsed={elapsed} />
+                    <TimerSection elapsed={elapsed} duration={duration} />
                   </Center>
                   <Center>
                     <Box

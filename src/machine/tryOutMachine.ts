@@ -143,7 +143,7 @@ export const tryOutMachine =
         elapsed: (ctx) => ctx.elapsed + ctx.interval,
       }),
       setDuration: assign({
-        duration: (ctx, _) => ctx.questions.length * 3,
+        duration: (ctx, _) => ctx.questions.length * 6,
       }),
       nextQuestion: assign({
         selectedQuestion: (ctx) => ctx.selectedQuestion + 1,
