@@ -33,16 +33,7 @@ import { ErrorModal } from "./widgets/ErrorModal";
 import type { MachineStates } from "./machine/type";
 
 function App() {
-  const [state, send, service] = useMachine(tryOutMachine);
-
-  // Debugguing Purposes
-  React.useEffect(() => {
-    const subscription = service.subscribe((state) => {
-      console.log(state);
-    });
-
-    return subscription.unsubscribe;
-  }, [service]);
+  const [state, send] = useMachine(tryOutMachine);
 
   const isAnsweredProps = {
     transform: "scale(0.98)",
